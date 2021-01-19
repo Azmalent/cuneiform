@@ -1,0 +1,18 @@
+{
+  "minVersion": "0.8",
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "cuneiform.mixins.refmap.json",
+  "package": "azmalent.cuneiform.mixin",
+  "mixins": [
+    "ArrowEntityMixin",
+    "ShulkerEntityMixin",
+    "SpongeBlockMixin",
+    "WetSpongeBlockMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,35 @@
+modLoader="javafml"
+loaderVersion="[${fml_min},)"
+license="GPL v3.0"
+
+[[mods]]
+modId="cuneiform"
+version="${mod_version}"
+displayName="${mod_name}"
+logoFile="cuneiform.png"
+authors="Azmalent"
+description='''
+Yet another library for Minecraft modding.
+'''
+
+[[dependencies.cuneiform]]
+    modId="forge"
+    mandatory=true
+    versionRange="[${forge_version},)"
+    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+    ordering="NONE"
+    # Side this dependency is applied on - BOTH, CLIENT or SERVER
+    side="BOTH"
+
+[[dependencies.cuneiform]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.cuneiform]]
+    modId="consecration"
+    mandatory=false
+    ordering="NONE"
+    side="BOTH"
