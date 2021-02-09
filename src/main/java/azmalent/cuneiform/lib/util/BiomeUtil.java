@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
+@SuppressWarnings("unused")
 public final class BiomeUtil {
     @SuppressWarnings("ConstantConditions")
     public static RegistryKey<Biome> getBiomeKey(Biome biome) {

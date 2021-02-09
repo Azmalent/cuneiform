@@ -2,8 +2,6 @@ package azmalent.cuneiform.lib.registry;
 
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ComposterBlock;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.item.Item;
@@ -12,16 +10,17 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.DeferredRegister;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class BlockRegistryHelper {
     public final DeferredRegister<Block> blocks;
     public final DeferredRegister<Item> items;
     public final ItemGroup defaultTab;
+
+    private final Map<BlockEntry, BlockRenderType> renderTypes = Maps.newHashMap();
 
     public BlockRegistryHelper(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry, ItemGroup defaultCreativeTab) {
         blocks = blockRegistry;
@@ -41,17 +40,15 @@ public class BlockRegistryHelper {
         return new BlockEntry.Builder(this, id, properties);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public void setRenderType(RenderType renderType, BlockEntry... blockEntries) {
-        for (BlockEntry blockEntry : blockEntries) {
-            if (blockEntry != null) {
-                RenderTypeLookup.setRenderLayer(blockEntry.getBlock(), renderType);
-            }
-        }
+    public void setRenderType(BlockEntry blockEntry, BlockRenderType renderType) {
+        renderTypes.put(blockEntry, renderType);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public void setCutout(BlockEntry... blockEntries) {
-        setRenderType(RenderType.getCutout(), blockEntries);
+    public void initRenderTypes() {
+        for (Map.Entry<BlockEntry, BlockRenderType> entry : renderTypes.entrySet()) {
+            BlockEntry blockEntry = entry.getKey();
+            BlockRenderType renderType = entry.getValue();
+            RenderTypeLookup.setRenderLayer(blockEntry.getBlock(), renderType.get());
+        }
     }
 }

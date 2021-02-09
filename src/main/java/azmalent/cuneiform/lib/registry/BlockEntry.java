@@ -2,9 +2,11 @@ package azmalent.cuneiform.lib.registry;
 
 import azmalent.cuneiform.lib.config.options.BooleanOption;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 
@@ -13,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class BlockEntry {
     public final RegistryObject<Block> block;
     public final RegistryObject<Item> item;
@@ -22,19 +25,19 @@ public class BlockEntry {
         item = null;
     }
 
-    public BlockEntry(DeferredRegister<Block> blockRegistry, String id, Supplier<? extends Block> constructor) {
+    private BlockEntry(DeferredRegister<Block> blockRegistry, String id, Supplier<? extends Block> constructor) {
         block = blockRegistry.register(id, constructor);
         item = null;
     }
 
-    public BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
+    private BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
                       String id, Supplier<? extends Block> constructor, ItemGroup creativeTab) {
         this(blockRegistry, itemRegistry, id, constructor, (block) ->
            new BlockItem(block, new Item.Properties().group(creativeTab))
         );
     }
 
-    public BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
+    private BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
                       String id, Supplier<? extends Block> constructor, Function<Block, ? extends BlockItem> blockItemConstructor) {
         block = blockRegistry.register(id, constructor);
         item = itemRegistry.register(id, () -> blockItemConstructor.apply(block.get()));
@@ -52,6 +55,10 @@ public class BlockEntry {
         return block.get();
     }
 
+    public BlockState getDefaultState() {
+        return block.get().getDefaultState();
+    }
+
     public Item getItem() {
         if (block != null && item == null) {
             throw new NullPointerException(String.format("The block %s doesn't have an item form!", getBlock().getRegistryName()));
@@ -60,12 +67,22 @@ public class BlockEntry {
         return item.get();
     }
 
+    public ItemStack makeStack() {
+        return makeStack(1);
+    }
+
+    public ItemStack makeStack(int amount) {
+        return new ItemStack(getItem(), amount);
+    }
+
+    @SuppressWarnings("ConstantConditions")
     public static class Builder {
         protected String id;
         protected Supplier<? extends Block> constructor;
         protected Function<Block, ? extends BlockItem> blockItemConstructor;
         protected Consumer<BlockEntry> postInitCallback;
         protected boolean noItemForm = false;
+        protected BlockRenderType renderType = BlockRenderType.SOLID;
 
         protected BlockRegistryHelper helper;
 
@@ -96,6 +113,11 @@ public class BlockEntry {
             }
 
             if (postInitCallback != null) postInitCallback.accept(entry);
+
+            if (renderType != BlockRenderType.SOLID) {
+                helper.setRenderType(entry, renderType);
+            }
+
             return entry;
         }
 
@@ -117,13 +139,29 @@ public class BlockEntry {
         }
 
         public Builder withBlockItemProperties(Item.Properties properties) {
-            blockItemConstructor = (block) -> new BlockItem(block, properties);
-            return this;
+            return this.withBlockItem((block) -> new BlockItem(block, properties));
         }
 
         public Builder withoutItemForm() {
             this.noItemForm = true;
             return this;
+        }
+
+        public Builder withRenderType(BlockRenderType type) {
+            this.renderType = type;
+            return this;
+        }
+
+        public Builder cutoutRender() {
+            return this.withRenderType(BlockRenderType.CUTOUT);
+        }
+
+        public Builder cutoutMippedRender() {
+            return this.withRenderType(BlockRenderType.CUTOUT_MIPPED);
+        }
+
+        public Builder transculentRender() {
+            return this.withRenderType(BlockRenderType.TRANSCULENT);
         }
 
         public Builder onInit(Consumer<BlockEntry> callback) {

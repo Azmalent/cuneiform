@@ -27,7 +27,7 @@ public final class CuneiformConfig {
             public static BooleanOption enabled = new BooleanOption(true);
 
             @Comment("Any lines containing the following text will be removed from the logs.")
-            public static ListOption<String> stringsToRemove = new ListOption(Lists.newArrayList(
+            public static ListOption<String> stringsToRemove = new ListOption<>(Lists.newArrayList(
                 "[net.minecraft.util.Util]: No data fixer registered for",
                 "[net.minecraft.command.Commands]: Ambiguity between arguments"
             ));
@@ -50,7 +50,7 @@ public final class CuneiformConfig {
             public static BooleanOption tippedArrowPatch = new BooleanOption(true);
 
             @Name("Arrow Instant Effect Scaling")
-            public static DoubleOption tippedArrowScaling = new DoubleOption(1/4d, 1/8d, 1);
+            public static DoubleOption tippedArrowScaling = new DoubleOption(1/8d).inRange(1/8d, 1);
 
             @Name("Shulker Shell Piercing")
             @Comment("Allows arrows fired from crossbows enchanted with Piercing to damage closed shulkers.")

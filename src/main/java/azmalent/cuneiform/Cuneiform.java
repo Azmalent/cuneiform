@@ -8,19 +8,18 @@ import azmalent.cuneiform.filter.FilteringUtil;
 import azmalent.cuneiform.lib.compat.ModCompatUtil;
 import azmalent.cuneiform.lib.compat.ModProxy;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.item.Item;
+import net.minecraft.command.CommandSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(Cuneiform.MODID)
-@Mod.EventBusSubscriber
+@SuppressWarnings({"unused", "unchecked"})
 public final class Cuneiform {
     public static final String MODID = "cuneiform";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
@@ -40,7 +39,7 @@ public final class Cuneiform {
     }
 
     private static void registerCommands(final RegisterCommandsEvent event) {
-        CommandDispatcher dispatcher = event.getDispatcher();
+        CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
 
         if (CuneiformConfig.Server.Commands.dimteleport.get()) {
             new DimensionTeleportCommand().register(dispatcher);

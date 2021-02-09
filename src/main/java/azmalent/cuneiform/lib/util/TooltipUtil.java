@@ -9,10 +9,14 @@ import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectUtils;
 import net.minecraft.util.text.*;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 import java.util.Map;
 
+@OnlyIn(Dist.CLIENT)
+@SuppressWarnings("unused")
 public final class TooltipUtil {
     public static void addEffectsTooltip(List<EffectInstance> effects, List<ITextComponent> tooltip) {
         addEffectsTooltip(effects, tooltip, 1);

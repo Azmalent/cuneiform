@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 
+@SuppressWarnings("unused")
 public final class BooleanOption extends AbstractConfigOption<Boolean, Boolean> {
     private ForgeConfigSpec.BooleanValue value;
     private final boolean defaultValue;
@@ -13,17 +14,17 @@ public final class BooleanOption extends AbstractConfigOption<Boolean, Boolean> 
         this.defaultValue = defaultValue;
     }
 
-    public BooleanOption(boolean defaultValue, String flag) {
-        this.defaultValue = defaultValue;
-        this.flag = flag;
-    }
-
     public Boolean get() {
         return value.get();
     }
 
     public void set(Boolean value) {
         this.value.set(value);
+    }
+
+    public BooleanOption withFlag(String flag) {
+        this.flag = flag;
+        return this;
     }
 
     public boolean hasFlag() {

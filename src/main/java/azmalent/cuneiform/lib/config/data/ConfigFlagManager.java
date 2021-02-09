@@ -5,10 +5,13 @@ import net.minecraft.loot.LootConditionType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public final class ConfigFlagManager {
     public static LootConditionType LOOT_CONFIG_CONDITION = new LootConditionType(new LootConfigCondition.Serializer());
 
@@ -32,11 +35,17 @@ public final class ConfigFlagManager {
     }
 
     public static boolean getFlag(String modid, String flag) {
-        if (!flagsByModid.containsKey(modid)) return false;
+        if (flagsByModid.containsKey(modid)) {
+            Map<String, Boolean> modFlags = flagsByModid.get(modid);
+            if (modFlags.containsKey(flag)) {
+                return modFlags.get(flag);
+            }
+        }
 
-        Map<String, Boolean> modFlags = flagsByModid.get(modid);
-        if (!modFlags.containsKey(flag)) return false;
+        if (ModList.get().isLoaded(modid)) {
+            Cuneiform.LOGGER.warn(String.format("Unknown flag '%s:%s', defaulting to false", modid, flag));
+        }
 
-        return modFlags.get(flag);
+        return false;
     }
 }

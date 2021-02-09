@@ -15,6 +15,7 @@ public final class DimensionTeleportCommand extends AbstractCommand {
     public void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralCommandNode<CommandSource> node = dispatcher.register(
             literal("dimteleport")
+                .requires(player -> player.hasPermissionLevel(2))
                 .then(
                     argument("dimension", DimensionArgument.getDimension())
                     .executes(context -> {

@@ -2,6 +2,7 @@ package azmalent.cuneiform.lib.util;
 
 import net.minecraft.nbt.CompoundNBT;
 
+@SuppressWarnings("unused")
 public final class NbtUtil {
     public static CompoundNBT getNestedCompound(CompoundNBT tag, String path) {
         CompoundNBT currentTag = tag;

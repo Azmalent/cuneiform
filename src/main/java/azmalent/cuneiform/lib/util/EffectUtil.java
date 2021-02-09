@@ -7,6 +7,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 
+@SuppressWarnings("unused")
 public final class EffectUtil {
     public final void applyScaledEffect(EffectInstance effect, float scale, LivingEntity livingEntity) {
         Effect potion = effect.getPotion();

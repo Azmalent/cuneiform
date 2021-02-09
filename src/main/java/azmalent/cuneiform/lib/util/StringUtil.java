@@ -2,6 +2,7 @@ package azmalent.cuneiform.lib.util;
 
 import java.util.StringJoiner;
 
+@SuppressWarnings("unused")
 public final class StringUtil {
     public static String splitCamelCase(String string) {
         String result = string.trim().replaceAll(String.format("%s|%s|%s",

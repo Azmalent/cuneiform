@@ -14,12 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public class ModCompatUtil {
-    public static void initModProxies(Class modClass) {
-        String modid = ReflectionUtil.getAnnotation(modClass, Mod.class).value();
-        initModProxies(modClass, modid);
-    }
-
     @SuppressWarnings("unchecked")
     public static void initModProxies(Class modCompatClass, String modid) {
         Object instance = ReflectionUtil.getSingletonInstance(modCompatClass);
@@ -41,7 +37,7 @@ public class ModCompatUtil {
     }
 
     private static <TMod> Map<String, Field> findProxyFields(Class<TMod> clazz) {
-        Map<String, Field> proxies = new HashMap();
+        Map<String, Field> proxies = Maps.newHashMap();
 
         for (Field field : clazz.getFields()) {
             ModProxy proxyAnnotation = field.getAnnotation(ModProxy.class);

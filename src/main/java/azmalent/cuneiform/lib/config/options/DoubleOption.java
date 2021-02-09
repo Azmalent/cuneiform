@@ -1,21 +1,57 @@
 package azmalent.cuneiform.lib.config.options;
 
+import azmalent.cuneiform.lib.util.StringUtil;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Doubles;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public final class DoubleOption extends AbstractNumericOption<Double> {
+@SuppressWarnings("unused")
+public final class DoubleOption extends AbstractConfigOption<Double, Double> {
+    protected ForgeConfigSpec.ConfigValue<Double> value;
+    protected double defaultValue;
+
+    private boolean rangeRestricted = false;
+    private double min;
+    private double max;
+
+    private List<Double> allowedValues;
+
     public DoubleOption(double defaultValue) {
-        super(defaultValue);
+        this.defaultValue = defaultValue;
     }
 
-    public DoubleOption(double defaultValue, double min, double max) {
-        super(defaultValue, min, max);
+    @Override
+    public Double get() {
+        return value.get();
     }
 
-    public DoubleOption(double defaultValue, Collection<Double> allowedValues) {
-        super(defaultValue, allowedValues);
+    @Override
+    public void set(Double newValue) {
+        value.set(newValue);
+    }
+
+    public DoubleOption inRange(double min, double max) {
+        if (min > max) {
+            throw new IllegalArgumentException("Invalid range");
+        }
+
+        this.rangeRestricted = true;
+        this.min = min;
+        this.max = max;
+
+        return this;
+    }
+
+    public DoubleOption withAllowedValues(double... allowedValues) {
+        this.allowedValues = Arrays.stream(allowedValues).boxed().collect(Collectors.toList());
+        return this;
     }
 
     @Override
@@ -24,8 +60,14 @@ public final class DoubleOption extends AbstractNumericOption<Double> {
             value = addComment(builder, field, "Default: " + defaultValue)
                     .defineInRange(getName(field), defaultValue, min, max);
         }
+        else if (allowedValues != null) {
+            value = addComment(builder, field,
+                    "Default: " + defaultValue,
+                    "Allowed values: [" + StringUtil.joinObjects(", ", allowedValues) + "]"
+            ).defineInList(getName(field), defaultValue, allowedValues);
+        }
         else {
-            super.init(builder, field);
+            value = builder.define(getName(field), defaultValue);
         }
     }
 
