@@ -5,7 +5,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,7 +64,7 @@ public final class IntOption extends AbstractConfigOption<Integer, Integer> {
             ).defineInList(getName(field), defaultValue, allowedValues);
         }
         else {
-            value = builder.define(getName(field), defaultValue);
+            value = addComment(builder, field, "Default: " + defaultValue).define(getName(field), defaultValue);
         }
     }
 }

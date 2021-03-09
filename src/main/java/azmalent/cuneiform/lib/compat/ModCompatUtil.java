@@ -4,13 +4,11 @@ import azmalent.cuneiform.Cuneiform;
 import azmalent.cuneiform.lib.util.ReflectionUtil;
 import com.google.common.collect.Maps;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

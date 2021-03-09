@@ -2,7 +2,6 @@ package azmalent.cuneiform.mixin;
 
 import azmalent.cuneiform.CuneiformConfig;
 import net.minecraft.block.Block;
-import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.block.SpongeBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;

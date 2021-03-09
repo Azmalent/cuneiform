@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 
+@SuppressWarnings("unused")
 public final class ConfigOption<T> extends AbstractConfigOption<T, T> {
     private T defaultValue;
     private ForgeConfigSpec.ConfigValue<T> value;

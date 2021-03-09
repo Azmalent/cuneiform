@@ -2,7 +2,6 @@ package azmalent.cuneiform.lib.registry;
 
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -44,6 +43,7 @@ public class BlockRegistryHelper {
         renderTypes.put(blockEntry, renderType);
     }
 
+    @OnlyIn(Dist.CLIENT)
     public void initRenderTypes() {
         for (Map.Entry<BlockEntry, BlockRenderType> entry : renderTypes.entrySet()) {
             BlockEntry blockEntry = entry.getKey();

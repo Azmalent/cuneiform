@@ -7,6 +7,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public final class RegistryListOption<T extends IForgeRegistryEntry<T>> extends LazyListOption<T> {
     public RegistryListOption(IForgeRegistry<T> registry) {
         this(registry, Lists.newArrayList());
@@ -17,5 +18,10 @@ public final class RegistryListOption<T extends IForgeRegistryEntry<T>> extends 
             ResourceLocation key = new ResourceLocation(id);
             return registry.containsKey(key) ? registry.getValue(key) : null;
         });
+    }
+
+    @SuppressWarnings("SuspiciousMethodCalls")
+    public boolean contains(IForgeRegistryEntry<T> item) {
+        return get().contains(item);
     }
 }

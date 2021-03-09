@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@SuppressWarnings("unused")
 @Mixin(ShulkerEntity.class)
 abstract class ShulkerEntityMixin extends GolemEntity {
     public ShulkerEntityMixin(EntityType<? extends ShulkerEntity> p_i50196_1_, World p_i50196_2_) {

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public final class ListOption<T> extends AbstractConfigOption<List<? extends T>, List<? extends  T>> {
     private ForgeConfigSpec.ConfigValue<List<? extends T>> value;
     private List<? extends T> defaultValue;

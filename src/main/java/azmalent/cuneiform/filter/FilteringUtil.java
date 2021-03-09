@@ -24,7 +24,7 @@ public class FilteringUtil {
     public static boolean shouldTruncateException(Throwable exception) {
         if (exception == null) return false;
 
-        for (Class clazz : CuneiformConfig.Common.Filtering.exceptionsToTruncate.get()) {
+        for (Class<?> clazz : CuneiformConfig.Common.Filtering.exceptionsToTruncate.get()) {
             if (clazz.isAssignableFrom(exception.getClass())) return true;
         }
 

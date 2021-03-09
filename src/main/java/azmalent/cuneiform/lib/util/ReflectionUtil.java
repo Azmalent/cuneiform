@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public final class ReflectionUtil {
     public static Class tryGetClass(@Nonnull String name) {
         try {

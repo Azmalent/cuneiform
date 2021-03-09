@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 
+@SuppressWarnings("unused")
 public final class EnumOption<E extends Enum<E>> extends AbstractConfigOption<E, E> {
     private ForgeConfigSpec.EnumValue<E> value;
     private E defaultValue;

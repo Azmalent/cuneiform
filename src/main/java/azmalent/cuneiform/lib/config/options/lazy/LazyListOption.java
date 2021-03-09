@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class LazyListOption<T> extends AbstractConfigOption<List<T>, List<? extends String>> implements ILazyOption {
     protected ForgeConfigSpec.ConfigValue<List<? extends String>> stringValues;
     private final List<String> defaultValue;

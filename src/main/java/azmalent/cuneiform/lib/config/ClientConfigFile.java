@@ -2,6 +2,7 @@ package azmalent.cuneiform.lib.config;
 
 import net.minecraftforge.fml.config.ModConfig;
 
+@SuppressWarnings("unused")
 public abstract class ClientConfigFile extends AbstractConfigFile {
     protected ClientConfigFile(String modid) {
         super(modid);

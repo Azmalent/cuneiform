@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 public final class RegexListOption extends LazyListOption<Pattern> {
     public RegexListOption() {
         this(Lists.newArrayList());

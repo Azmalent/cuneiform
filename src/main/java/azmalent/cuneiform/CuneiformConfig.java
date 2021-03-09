@@ -7,7 +7,6 @@ import azmalent.cuneiform.lib.config.options.*;
 import azmalent.cuneiform.lib.config.annotations.Comment;
 import azmalent.cuneiform.lib.config.annotations.Name;
 import azmalent.cuneiform.lib.config.options.lazy.ClassListOption;
-import azmalent.cuneiform.lib.config.options.ListOption;
 import azmalent.cuneiform.lib.config.options.lazy.RegexListOption;
 import com.google.common.collect.Lists;
 

@@ -7,6 +7,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.lang.reflect.Field;
 import java.util.function.Function;
 
+@SuppressWarnings("unused")
 public class LazyOption<T> extends AbstractConfigOption<T, String> implements ILazyOption {
     protected ForgeConfigSpec.ConfigValue<String> stringValue;
     protected final String defaultValue;

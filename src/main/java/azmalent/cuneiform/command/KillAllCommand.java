@@ -1,7 +1,6 @@
 package azmalent.cuneiform.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 

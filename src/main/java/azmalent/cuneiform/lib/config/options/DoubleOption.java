@@ -1,14 +1,10 @@
 package azmalent.cuneiform.lib.config.options;
 
 import azmalent.cuneiform.lib.util.StringUtil;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Doubles;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,7 +63,7 @@ public final class DoubleOption extends AbstractConfigOption<Double, Double> {
             ).defineInList(getName(field), defaultValue, allowedValues);
         }
         else {
-            value = builder.define(getName(field), defaultValue);
+            value = addComment(builder, field, "Default: " + defaultValue).define(getName(field), defaultValue);
         }
     }
 

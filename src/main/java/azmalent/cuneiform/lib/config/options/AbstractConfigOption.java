@@ -8,6 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Field;
 
+@SuppressWarnings("unused")
 public abstract class AbstractConfigOption<TGet, TSet> {
     public abstract TGet get();
     public abstract void set(TSet newValue);

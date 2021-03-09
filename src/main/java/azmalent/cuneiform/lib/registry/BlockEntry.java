@@ -3,20 +3,20 @@ package azmalent.cuneiform.lib.registry;
 import azmalent.cuneiform.lib.config.options.BooleanOption;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
+import net.minecraft.util.IItemProvider;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public class BlockEntry {
+public class BlockEntry implements IItemProvider {
     public final RegistryObject<Block> block;
     public final RegistryObject<Item> item;
 
@@ -43,10 +43,6 @@ public class BlockEntry {
         item = itemRegistry.register(id, () -> blockItemConstructor.apply(block.get()));
     }
 
-    public boolean isRegistered() {
-        return block != null;
-    }
-
     public boolean hasItemForm() {
         return item != null;
     }
@@ -59,20 +55,27 @@ public class BlockEntry {
         return block.get().getDefaultState();
     }
 
-    public Item getItem() {
-        if (block != null && item == null) {
-            throw new NullPointerException(String.format("The block %s doesn't have an item form!", getBlock().getRegistryName()));
-        }
-
-        return item.get();
-    }
-
     public ItemStack makeStack() {
         return makeStack(1);
     }
 
     public ItemStack makeStack(int amount) {
-        return new ItemStack(getItem(), amount);
+        return new ItemStack(asItem(), amount);
+    }
+
+    @Deprecated
+    public Item getItem() {
+        return asItem();
+    }
+
+    @Override
+    @Nonnull
+    public Item asItem() {
+        if (item == null) {
+            throw new NullPointerException(String.format("The block %s doesn't have an item form!", getBlock().getRegistryName()));
+        }
+
+        return item.get();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -121,16 +124,12 @@ public class BlockEntry {
             return entry;
         }
 
-        @Nullable
-        public final BlockEntry buildIf(boolean condition) {
-            if (condition) return build();
-            return null;
+        public final Optional<BlockEntry> buildIf(boolean condition) {
+            return condition ? Optional.of(build()) : Optional.empty();
         }
 
-        @Nullable
-        public final BlockEntry buildIf(BooleanOption condition) {
-            if (condition.get()) return build();
-            return null;
+        public final Optional<BlockEntry> buildIf(BooleanOption condition) {
+            return buildIf(condition.get());
         }
 
         public Builder withBlockItem(Function<Block, ? extends BlockItem> blockItemConstructor) {
@@ -138,8 +137,42 @@ public class BlockEntry {
             return this;
         }
 
+        public Builder withBlockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, Item.Properties properties) {
+            this.blockItemConstructor = block -> blockItemConstructor.apply(block, properties);
+            return this;
+        }
+
+        public Builder withBlockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, ItemGroup group) {
+            return this.withBlockItem(blockItemConstructor, new Item.Properties().group(group));
+        }
+
+        public Builder withTallBlockItem(Item.Properties properties) {
+            return this.withBlockItem(TallBlockItem::new, properties);
+        }
+
+        public Builder withTallBlockItem(ItemGroup group) {
+            return this.withBlockItem(TallBlockItem::new, group);
+        }
+
+        public Builder withWallOrFloorItem(BlockEntry wallBlock, Item.Properties properties) {
+            return this.withBlockItem(block -> new WallOrFloorItem(wallBlock.getBlock(), block, properties));
+        }
+
+        public Builder withWallOrFloorItem(BlockEntry wallBlock, ItemGroup group) {
+            return this.withWallOrFloorItem(wallBlock, new Item.Properties().group(group));
+        }
+
+        @Deprecated
         public Builder withBlockItemProperties(Item.Properties properties) {
-            return this.withBlockItem((block) -> new BlockItem(block, properties));
+            return this.withItemProperties(properties);
+        }
+
+        public Builder withItemProperties(Item.Properties properties) {
+            return this.withBlockItem(BlockItem::new, properties);
+        }
+
+        public Builder withItemGroup(ItemGroup group) {
+            return this.withItemProperties(new Item.Properties().group(group));
         }
 
         public Builder withoutItemForm() {
