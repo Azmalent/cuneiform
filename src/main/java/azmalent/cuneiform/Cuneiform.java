@@ -3,6 +3,7 @@ package azmalent.cuneiform;
 import azmalent.cuneiform.command.DimensionTeleportCommand;
 import azmalent.cuneiform.command.KillAllCommand;
 import azmalent.cuneiform.command.KillItemsCommand;
+import azmalent.cuneiform.common.event.FuelHandler;
 import azmalent.cuneiform.compat.IConsecrationCompat;
 import azmalent.cuneiform.filter.FilteringUtil;
 import azmalent.cuneiform.lib.compat.ModCompatUtil;
@@ -33,6 +34,7 @@ public final class Cuneiform {
         ModCompatUtil.initModProxies(Cuneiform.class, MODID);
 
         MinecraftForge.EVENT_BUS.addListener(Cuneiform::registerCommands);
+        MinecraftForge.EVENT_BUS.addListener(FuelHandler::getBurnTime);
     }
 
     private static void registerCommands(final RegisterCommandsEvent event) {

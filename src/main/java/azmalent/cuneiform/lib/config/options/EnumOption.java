@@ -3,6 +3,7 @@ package azmalent.cuneiform.lib.config.options;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public final class EnumOption<E extends Enum<E>> extends AbstractConfigOption<E, E> {

@@ -6,6 +6,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -14,8 +15,8 @@ public final class IntOption extends AbstractConfigOption<Integer, Integer> {
     private int defaultValue;
 
     private boolean rangeRestricted = false;
-    private int min;
-    private int max;
+    private int min = Integer.MIN_VALUE;
+    private int max = Integer.MAX_VALUE;
 
     private List<Integer> allowedValues;
 
@@ -33,12 +34,15 @@ public final class IntOption extends AbstractConfigOption<Integer, Integer> {
         value.set(newValue);
     }
 
+    public IntOption nonNegative() {
+        return inRange(0, Integer.MAX_VALUE);
+    }
+
+    public IntOption positive() {
+        return inRange(1, Integer.MAX_VALUE);
+    }
 
     public IntOption inRange(int min, int max) {
-        if (min > max) {
-            throw new IllegalArgumentException("Invalid range");
-        }
-
         this.rangeRestricted = true;
         this.min = min;
         this.max = max;

@@ -7,10 +7,13 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public abstract class AbstractConfigOption<TGet, TSet> {
+public abstract class AbstractConfigOption<TGet, TSet> implements Supplier<TGet> {
+    @Override
     public abstract TGet get();
+
     public abstract void set(TSet newValue);
 
     public abstract void init(ForgeConfigSpec.Builder builder, Field field);

@@ -1,5 +1,6 @@
 package azmalent.cuneiform.lib.registry;
 
+import azmalent.cuneiform.common.item.CeilingOrFloorItem;
 import azmalent.cuneiform.lib.config.options.BooleanOption;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -124,10 +125,12 @@ public class BlockEntry implements IItemProvider {
             return entry;
         }
 
+        @Deprecated
         public final Optional<BlockEntry> buildIf(boolean condition) {
             return condition ? Optional.of(build()) : Optional.empty();
         }
 
+        @Deprecated
         public final Optional<BlockEntry> buildIf(BooleanOption condition) {
             return buildIf(condition.get());
         }
@@ -160,6 +163,14 @@ public class BlockEntry implements IItemProvider {
 
         public Builder withWallOrFloorItem(BlockEntry wallBlock, ItemGroup group) {
             return this.withWallOrFloorItem(wallBlock, new Item.Properties().group(group));
+        }
+
+        public Builder withCeilingOrFloorItem(BlockEntry floorBlock, Item.Properties properties) {
+            return this.withBlockItem(block -> new CeilingOrFloorItem(floorBlock.getBlock(), block, properties));
+        }
+
+        public Builder withCeilingOrFloorItem(BlockEntry floorBlock, ItemGroup group) {
+            return this.withCeilingOrFloorItem(floorBlock, new Item.Properties().group(group));
         }
 
         @Deprecated

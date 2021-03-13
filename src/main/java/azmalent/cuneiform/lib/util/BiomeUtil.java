@@ -4,19 +4,24 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"})
 public final class BiomeUtil {
-    @SuppressWarnings("ConstantConditions")
-    public static RegistryKey<Biome> getBiomeKey(Biome biome) {
-        return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
+    public static Biome getBiomeKey(int id) {
+        return WorldGenRegistries.BIOME.getByValue(id);
     }
 
     public static RegistryKey<Biome> getBiomeKey(ResourceLocation id) {
         return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, id);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static RegistryKey<Biome> getBiomeKey(Biome biome) {
+        return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -42,5 +47,9 @@ public final class BiomeUtil {
         }
 
         return true;
+    }
+
+    public static boolean hasNoneOfTypes(RegistryKey<Biome> biome, BiomeDictionary.Type... types) {
+        return !hasAnyType(biome, types);
     }
 }

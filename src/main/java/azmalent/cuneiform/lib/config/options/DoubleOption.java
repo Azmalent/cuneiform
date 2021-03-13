@@ -33,11 +33,11 @@ public final class DoubleOption extends AbstractConfigOption<Double, Double> {
         value.set(newValue);
     }
 
-    public DoubleOption inRange(double min, double max) {
-        if (min > max) {
-            throw new IllegalArgumentException("Invalid range");
-        }
+    public DoubleOption inUnitRange() {
+        return inRange(0, 1);
+    }
 
+    public DoubleOption inRange(double min, double max) {
         this.rangeRestricted = true;
         this.min = min;
         this.max = max;

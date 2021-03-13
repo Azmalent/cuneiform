@@ -3,6 +3,7 @@ package azmalent.cuneiform.lib.config.options;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public final class BooleanOption extends AbstractConfigOption<Boolean, Boolean> {
@@ -14,10 +15,12 @@ public final class BooleanOption extends AbstractConfigOption<Boolean, Boolean> 
         this.defaultValue = defaultValue;
     }
 
+    @Override
     public Boolean get() {
         return value.get();
     }
 
+    @Override
     public void set(Boolean value) {
         this.value.set(value);
     }
