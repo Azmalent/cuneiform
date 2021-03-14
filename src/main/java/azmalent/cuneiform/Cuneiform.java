@@ -4,7 +4,7 @@ import azmalent.cuneiform.command.DimensionTeleportCommand;
 import azmalent.cuneiform.command.KillAllCommand;
 import azmalent.cuneiform.command.KillItemsCommand;
 import azmalent.cuneiform.common.event.FuelHandler;
-import azmalent.cuneiform.compat.IConsecrationCompat;
+import azmalent.cuneiform.common.integration.consecration.IConsecrationCompat;
 import azmalent.cuneiform.filter.FilteringUtil;
 import azmalent.cuneiform.lib.compat.ModCompatUtil;
 import azmalent.cuneiform.lib.compat.ModProxy;

@@ -1,4 +1,4 @@
-package azmalent.cuneiform.compat;
+package azmalent.cuneiform.common.integration.consecration;
 
 import azmalent.cuneiform.lib.compat.ModProxyImpl;
 import net.minecraft.entity.LivingEntity;

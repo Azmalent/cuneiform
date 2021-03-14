@@ -38,16 +38,20 @@ public class FilteringUtil {
     }
 
     public static boolean isLoggable(String message) {
-        for (String stringToFilter : CuneiformConfig.Common.Filtering.stringsToRemove.get()) {
-            if (message.contains(stringToFilter)) {
-                return false;
+        try {
+            for (String stringToFilter : CuneiformConfig.Common.Filtering.stringsToRemove.get()) {
+                if (message.contains(stringToFilter)) {
+                    return false;
+                }
             }
-        }
 
-        for (Pattern pattern : CuneiformConfig.Common.Filtering.patternsToRemove.get()) {
-            if (pattern.matcher(message).find()) {
-                return false;
+            for (Pattern pattern : CuneiformConfig.Common.Filtering.patternsToRemove.get()) {
+                if (pattern.matcher(message).find()) {
+                    return false;
+                }
             }
+        } catch (NullPointerException e) {
+            //NO-OP
         }
 
         return true;
