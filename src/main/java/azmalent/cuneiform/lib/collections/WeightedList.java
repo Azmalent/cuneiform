@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Random;
 
+@SuppressWarnings("unused")
 public class WeightedList<T> {
     private static class Node<T> {
         protected final T value;

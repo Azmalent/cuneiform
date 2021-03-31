@@ -74,7 +74,11 @@ public class ModCompatUtil {
 
     private static Object createProxy(String thisModid, String targetModid, Class dummyClass, Class fieldType) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         if (dummyClass == null) {
-            throw new ClassNotFoundException("Missing dummy proxy for " + targetModid);
+            if (fieldType != IModIntegration.class) {
+                throw new ClassNotFoundException("Missing dummy proxy for " + targetModid);
+            }
+
+            dummyClass = BasicModDummy.class;
         }
 
         try {
