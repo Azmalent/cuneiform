@@ -1,9 +1,9 @@
 package azmalent.cuneiform.lib.config.data;
 
 import azmalent.cuneiform.Cuneiform;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ModList;
 
@@ -12,12 +12,12 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public final class ConfigFlagManager {
-    public static LootConditionType LOOT_CONFIG_CONDITION = new LootConditionType(new LootConfigCondition.Serializer());
+    public static LootItemConditionType LOOT_CONFIG_CONDITION = new LootItemConditionType(new LootConfigCondition.Serializer());
 
     public static final Map<String, Map<String, Boolean>> flagsByModid = new HashMap<>();
 
     static {
-        ResourceLocation id = new ResourceLocation(Cuneiform.MODID, "config");
+        ResourceLocation id = Cuneiform.prefix("config");
         CraftingHelper.register(new RecipeConfigCondition.Serializer(id));
 
         Registry.register(Registry.LOOT_CONDITION_TYPE, id, LOOT_CONFIG_CONDITION);

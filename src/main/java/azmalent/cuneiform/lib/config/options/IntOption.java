@@ -6,7 +6,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")

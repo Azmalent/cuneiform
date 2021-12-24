@@ -2,13 +2,17 @@ package azmalent.cuneiform.lib.util;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectUtils;
-import net.minecraft.util.text.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,44 +22,44 @@ import java.util.Map;
 @OnlyIn(Dist.CLIENT)
 @SuppressWarnings("unused")
 public final class TooltipUtil {
-    public static void addEffectsTooltip(List<EffectInstance> effects, List<ITextComponent> tooltip) {
+    public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip) {
         addEffectsTooltip(effects, tooltip, 1);
     }
 
-    public static void addEffectsTooltip(List<EffectInstance> effects, List<ITextComponent> tooltip, float durationMultiplier) {
+    public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip, float durationMultiplier) {
         if (effects.isEmpty()) {
-            IFormattableTextComponent noEffect = (new TranslationTextComponent("effect.none")).mergeStyle(TextFormatting.GRAY);
+            MutableComponent noEffect = (new TranslatableComponent("effect.none")).withStyle(ChatFormatting.GRAY);
             tooltip.add(noEffect);
             return;
         }
 
         List<Pair<Attribute, AttributeModifier>> attributeModifiers = Lists.newArrayList();
 
-        for(EffectInstance effectInstance : effects) {
-            IFormattableTextComponent line = new TranslationTextComponent(effectInstance.getEffectName());
-            Effect effect = effectInstance.getPotion();
-            Map<Attribute, AttributeModifier> map = effect.getAttributeModifierMap();
+        for(MobEffectInstance effectInstance : effects) {
+            MutableComponent line = new TranslatableComponent(effectInstance.getDescriptionId());
+            MobEffect effect = effectInstance.getEffect();
+            Map<Attribute, AttributeModifier> map = effect.getAttributeModifiers();
             if (!map.isEmpty()) {
                 for(Map.Entry<Attribute, AttributeModifier> entry : map.entrySet()) {
                     AttributeModifier attributemodifier = entry.getValue();
-                    AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), effect.getAttributeModifierAmount(effectInstance.getAmplifier(), attributemodifier), attributemodifier.getOperation());
+                    AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), effect.getAttributeModifierValue(effectInstance.getAmplifier(), attributemodifier), attributemodifier.getOperation());
                     attributeModifiers.add(new Pair<>(entry.getKey(), attributemodifier1));
                 }
             }
 
             if (effectInstance.getAmplifier() > 0) {
-                line = new TranslationTextComponent("potion.withAmplifier", line, new TranslationTextComponent("potion.potency." + effectInstance.getAmplifier()));
+                line = new TranslatableComponent("potion.withAmplifier", line, new TranslatableComponent("potion.potency." + effectInstance.getAmplifier()));
             }
             else if (effectInstance.getDuration() > 20) {
-                line = new TranslationTextComponent("potion.withDuration", line, EffectUtils.getPotionDurationString(effectInstance, durationMultiplier));
+                line = new TranslatableComponent("potion.withDuration", line, MobEffectUtil.formatDuration(effectInstance, durationMultiplier));
             }
 
-            tooltip.add(line.mergeStyle(effect.getEffectType().getColor()));
+            tooltip.add(line.withStyle(effect.getCategory().getTooltipFormatting()));
         }
 
         if (!attributeModifiers.isEmpty()) {
-            tooltip.add(StringTextComponent.EMPTY);
-            tooltip.add((new TranslationTextComponent("potion.whenDrank")).mergeStyle(TextFormatting.DARK_PURPLE));
+            tooltip.add(TextComponent.EMPTY);
+            tooltip.add((new TranslatableComponent("potion.whenDrank")).withStyle(ChatFormatting.DARK_PURPLE));
 
             for(Pair<Attribute, AttributeModifier> pair : attributeModifiers) {
                 AttributeModifier modifier = pair.getSecond();
@@ -70,12 +74,12 @@ public final class TooltipUtil {
                 if (amount < 0.0D) d1 *= -1.0D;
 
                 tooltip.add((
-                    new TranslationTextComponent(
-                        String.format("attribute.modifier.%s.%i", amount > 0 ? "plus" : "take", modifier.getOperation().getId()),
-                        ItemStack.DECIMALFORMAT.format(d1),
-                        new TranslationTextComponent(pair.getFirst().getAttributeName())
+                    new TranslatableComponent(
+                        String.format("attribute.modifier.%s.%i", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
+                        ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                        new TranslatableComponent(pair.getFirst().getDescriptionId())
                     )
-                ).mergeStyle(amount > 0 ? TextFormatting.BLUE : TextFormatting.RED));
+                ).withStyle(amount > 0 ? ChatFormatting.BLUE : ChatFormatting.RED));
             }
         }
     }

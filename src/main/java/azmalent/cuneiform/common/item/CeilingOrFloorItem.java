@@ -1,18 +1,20 @@
 package azmalent.cuneiform.common.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Objects;
 
 public class CeilingOrFloorItem extends BlockItem {
     protected final Block floorBlock;
@@ -23,9 +25,9 @@ public class CeilingOrFloorItem extends BlockItem {
     }
 
     @Nullable
-    protected BlockState getStateForPlacement(BlockItemUseContext context) {
-        IWorldReader world = context.getWorld();
-        BlockPos pos = context.getPos();
+    public BlockState getPlacementState(BlockPlaceContext context) {
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
 
         for(Direction direction : context.getNearestLookingDirections()) {
             BlockState state = null;
@@ -36,8 +38,8 @@ public class CeilingOrFloorItem extends BlockItem {
                 state = this.getBlock().getStateForPlacement(context);
             }
 
-            if (state != null && state.isValidPosition(world, pos)) {
-                return world.placedBlockCollides(state, pos, ISelectionContext.dummy()) ? state : null;
+            if (state != null && state.canSurvive(world, pos)) {
+                return world.isUnobstructed(state, pos, CollisionContext.empty()) ? state : null;
             }
         }
 
@@ -45,14 +47,14 @@ public class CeilingOrFloorItem extends BlockItem {
     }
 
     @Override
-    public void addToBlockToItemMap(Map<Block, Item> blockToItemMap, @Nonnull Item itemIn) {
-        super.addToBlockToItemMap(blockToItemMap, itemIn);
+    public void registerBlocks(@NotNull Map<Block, Item> blockToItemMap, @Nonnull Item itemIn) {
+        super.registerBlocks(blockToItemMap, itemIn);
         blockToItemMap.put(this.floorBlock, itemIn);
     }
 
     @Override
-    public void removeFromBlockToItemMap(Map<Block, Item> blockToItemMap, Item itemIn) {
-        super.removeFromBlockToItemMap(blockToItemMap, itemIn);
+    public void removeFromBlockToItemMap(@NotNull Map<Block, Item> blockToItemMap, @NotNull Item itemIn) {
+        super.removeFromBlockToItemMap(blockToItemMap, Objects.requireNonNull(itemIn));
         blockToItemMap.remove(this.floorBlock);
     }
 }

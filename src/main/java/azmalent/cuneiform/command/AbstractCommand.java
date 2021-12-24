@@ -4,17 +4,17 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 @SuppressWarnings("unused")
 public abstract class AbstractCommand {
-    public abstract void register(CommandDispatcher<CommandSource> dispatcher);
+    public abstract void register(CommandDispatcher<CommandSourceStack> dispatcher);
 
-    protected static LiteralArgumentBuilder<CommandSource> literal(String name) {
+    protected static LiteralArgumentBuilder<CommandSourceStack> literal(String name) {
         return LiteralArgumentBuilder.literal(name);
     }
 
-    protected static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type) {
+    protected static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(String name, ArgumentType<T> type) {
         return RequiredArgumentBuilder.argument(name, type);
     }
 }

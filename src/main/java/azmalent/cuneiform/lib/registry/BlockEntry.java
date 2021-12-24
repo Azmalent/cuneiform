@@ -1,23 +1,21 @@
 package azmalent.cuneiform.lib.registry;
 
 import azmalent.cuneiform.common.item.CeilingOrFloorItem;
-import azmalent.cuneiform.lib.config.options.BooleanOption;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.*;
-import net.minecraft.util.IItemProvider;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public class BlockEntry implements IItemProvider {
+public class BlockEntry implements ItemLike {
     public final RegistryObject<Block> block;
     public final RegistryObject<Item> item;
 
@@ -32,9 +30,9 @@ public class BlockEntry implements IItemProvider {
     }
 
     private BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
-                      String id, Supplier<? extends Block> constructor, ItemGroup creativeTab) {
+                      String id, Supplier<? extends Block> constructor, CreativeModeTab creativeTab) {
         this(blockRegistry, itemRegistry, id, constructor, (block) ->
-           new BlockItem(block, new Item.Properties().group(creativeTab))
+           new BlockItem(block, new Item.Properties().tab(creativeTab))
         );
     }
 
@@ -53,7 +51,7 @@ public class BlockEntry implements IItemProvider {
     }
 
     public BlockState getDefaultState() {
-        return block.get().getDefaultState();
+        return block.get().defaultBlockState();
     }
 
     public ItemStack makeStack() {
@@ -62,11 +60,6 @@ public class BlockEntry implements IItemProvider {
 
     public ItemStack makeStack(int amount) {
         return new ItemStack(asItem(), amount);
-    }
-
-    @Deprecated
-    public Item getItem() {
-        return asItem();
     }
 
     @Override
@@ -125,16 +118,6 @@ public class BlockEntry implements IItemProvider {
             return entry;
         }
 
-        @Deprecated
-        public final Optional<BlockEntry> buildIf(boolean condition) {
-            return condition ? Optional.of(build()) : Optional.empty();
-        }
-
-        @Deprecated
-        public final Optional<BlockEntry> buildIf(BooleanOption condition) {
-            return buildIf(condition.get());
-        }
-
         public Builder withBlockItem(Function<Block, ? extends BlockItem> blockItemConstructor) {
             this.blockItemConstructor = blockItemConstructor;
             return this;
@@ -145,45 +128,40 @@ public class BlockEntry implements IItemProvider {
             return this;
         }
 
-        public Builder withBlockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, ItemGroup group) {
-            return this.withBlockItem(blockItemConstructor, new Item.Properties().group(group));
+        public Builder withBlockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, CreativeModeTab group) {
+            return this.withBlockItem(blockItemConstructor, new Item.Properties().tab(group));
         }
 
         public Builder withTallBlockItem(Item.Properties properties) {
-            return this.withBlockItem(TallBlockItem::new, properties);
+            return this.withBlockItem(DoubleHighBlockItem::new, properties);
         }
 
-        public Builder withTallBlockItem(ItemGroup group) {
-            return this.withBlockItem(TallBlockItem::new, group);
+        public Builder withTallBlockItem(CreativeModeTab group) {
+            return this.withBlockItem(DoubleHighBlockItem::new, group);
         }
 
         public Builder withWallOrFloorItem(BlockEntry wallBlock, Item.Properties properties) {
-            return this.withBlockItem(block -> new WallOrFloorItem(wallBlock.getBlock(), block, properties));
+            return this.withBlockItem(block -> new StandingAndWallBlockItem(wallBlock.getBlock(), block, properties));
         }
 
-        public Builder withWallOrFloorItem(BlockEntry wallBlock, ItemGroup group) {
-            return this.withWallOrFloorItem(wallBlock, new Item.Properties().group(group));
+        public Builder withWallOrFloorItem(BlockEntry wallBlock, CreativeModeTab group) {
+            return this.withWallOrFloorItem(wallBlock, new Item.Properties().tab(group));
         }
 
         public Builder withCeilingOrFloorItem(BlockEntry floorBlock, Item.Properties properties) {
             return this.withBlockItem(block -> new CeilingOrFloorItem(floorBlock.getBlock(), block, properties));
         }
 
-        public Builder withCeilingOrFloorItem(BlockEntry floorBlock, ItemGroup group) {
-            return this.withCeilingOrFloorItem(floorBlock, new Item.Properties().group(group));
-        }
-
-        @Deprecated
-        public Builder withBlockItemProperties(Item.Properties properties) {
-            return this.withItemProperties(properties);
+        public Builder withCeilingOrFloorItem(BlockEntry floorBlock, CreativeModeTab group) {
+            return this.withCeilingOrFloorItem(floorBlock, new Item.Properties().tab(group));
         }
 
         public Builder withItemProperties(Item.Properties properties) {
             return this.withBlockItem(BlockItem::new, properties);
         }
 
-        public Builder withItemGroup(ItemGroup group) {
-            return this.withItemProperties(new Item.Properties().group(group));
+        public Builder inCreativeTab(CreativeModeTab group) {
+            return this.withItemProperties(new Item.Properties().tab(group));
         }
 
         public Builder withoutItemForm() {

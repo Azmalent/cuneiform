@@ -52,8 +52,8 @@ public class ModCompatUtil {
         List<AnnotationData> annotationData = ReflectionUtil.getAnnotationDataFromMod(modid, ModProxyDummy.class);
         Map<String, Class> result = Maps.newHashMap();
         for (AnnotationData data : annotationData) {
-            String targetModid = (String) data.getAnnotationData().get("value");
-            Class clazz = ReflectionUtil.tryGetClass(data.getClassType().getClassName());
+            String targetModid = (String) data.annotationData().get("value");
+            Class clazz = ReflectionUtil.tryGetClass(data.clazz().getClassName());
             result.put(targetModid, clazz);
         }
 
@@ -63,9 +63,9 @@ public class ModCompatUtil {
     private static Class getImpl(String thisModid, String targetModid) {
         List<AnnotationData> annotationData = ReflectionUtil.getAnnotationDataFromMod(thisModid, ModProxyImpl.class);
         for (AnnotationData data : annotationData) {
-            String modid = (String) data.getAnnotationData().get("value");
+            String modid = (String) data.annotationData().get("value");
             if (modid.equals(targetModid)) {
-                return ReflectionUtil.tryGetClass(data.getClassType().getClassName());
+                return ReflectionUtil.tryGetClass(data.clazz().getClassName());
             }
         }
 

@@ -3,16 +3,18 @@ package azmalent.cuneiform;
 import azmalent.cuneiform.command.DimensionTeleportCommand;
 import azmalent.cuneiform.command.KillAllCommand;
 import azmalent.cuneiform.command.KillItemsCommand;
+import azmalent.cuneiform.common.crafting.StrippingByproductRecipe;
 import azmalent.cuneiform.common.event.FuelHandler;
-import azmalent.cuneiform.common.integration.consecration.IConsecrationCompat;
 import azmalent.cuneiform.filter.FilteringUtil;
-import azmalent.cuneiform.lib.compat.ModCompatUtil;
-import azmalent.cuneiform.lib.compat.ModProxy;
-import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandSource;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,23 +24,31 @@ public final class Cuneiform {
     public static final String MODID = "cuneiform";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-    @ModProxy("consecration")
-    public static IConsecrationCompat CONSECRATION_COMPAT;
-
     public Cuneiform() {
         CuneiformConfig.init();
         if (CuneiformConfig.Common.Filtering.enabled.get()) {
             FilteringUtil.applyLogFilter();
         }
 
-        ModCompatUtil.initModProxies(Cuneiform.class, MODID);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(RecipeSerializer.class, Cuneiform::registerRecipeTypes);
 
         MinecraftForge.EVENT_BUS.addListener(Cuneiform::registerCommands);
         MinecraftForge.EVENT_BUS.addListener(FuelHandler::getBurnTime);
     }
 
+    public static ResourceLocation prefix(String name) {
+        return new ResourceLocation(MODID, name);
+    }
+
+    private static void registerRecipeTypes(RegistryEvent.Register<RecipeSerializer<?>> event) {
+        IForgeRegistry<RecipeSerializer<?>> serializers = event.getRegistry();
+
+        Registry.register(Registry.RECIPE_TYPE, StrippingByproductRecipe.TYPE_ID, StrippingByproductRecipe.TYPE);
+        serializers.register(StrippingByproductRecipe.Serializer.INSTANCE.setRegistryName(StrippingByproductRecipe.TYPE_ID));
+    }
+
     private static void registerCommands(final RegisterCommandsEvent event) {
-        CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
+        var dispatcher = event.getDispatcher();
 
         if (CuneiformConfig.Server.Commands.dimteleport.get()) {
             new DimensionTeleportCommand().register(dispatcher);

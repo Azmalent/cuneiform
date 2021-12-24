@@ -27,9 +27,3 @@ Yet another library for Minecraft modding.
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
-
-[[dependencies.cuneiform]]
-    modId="consecration"
-    mandatory=false
-    ordering="NONE"
-    side="BOTH"

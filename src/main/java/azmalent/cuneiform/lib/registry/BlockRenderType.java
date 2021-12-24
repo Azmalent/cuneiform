@@ -12,10 +12,10 @@ public enum BlockRenderType {
     @OnlyIn(Dist.CLIENT)
     public RenderType get() {
         switch (this) {
-            case SOLID:         return RenderType.getSolid();
-            case CUTOUT:        return RenderType.getCutout();
-            case CUTOUT_MIPPED: return RenderType.getCutoutMipped();
-            case TRANSCULENT:   return RenderType.getTranslucent();
+            case SOLID:         return RenderType.solid();
+            case CUTOUT:        return RenderType.cutout();
+            case CUTOUT_MIPPED: return RenderType.cutoutMipped();
+            case TRANSCULENT:   return RenderType.translucent();
         }
 
         throw new AssertionError("Method did not return a value!");

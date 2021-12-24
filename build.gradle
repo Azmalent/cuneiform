@@ -1,12 +1,11 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://repo.spongepowered.org/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
@@ -14,15 +13,18 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
+apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
+
 ext.configFile = file('gradle.properties')
 ext.config = parseConfig(configFile)
 
+version = "${minecraft_version}-${mod_version}"
 group = "azmalent.${modid}"
 archivesBaseName = modid
-version = "${minecraft_version}-${mod_version}"
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava.options.compilerArgs << "-Xlint:all,-classfile,-processing,-deprecation"
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
@@ -61,7 +63,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'cuneiform', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 cuneiform {
@@ -70,6 +72,10 @@ minecraft {
             }
         }
     }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
 jar {
@@ -91,19 +97,6 @@ jar {
     }
 }
 
-repositories {
-    maven {
-        name 'Cursemaven'
-        url 'https://www.cursemaven.com'
-    }
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-    compile "curse.maven:consecration-284001:${consecration_file_id}"
-}
-
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
@@ -120,7 +113,7 @@ processResources {
 
 sourceSets {
     main {
-        output.resourcesDir = output.classesDir
+        //output.resourcesDir = output.classesDir
         ext.refMap = "cuneiform.mixins.refmap.json"
     }
 }

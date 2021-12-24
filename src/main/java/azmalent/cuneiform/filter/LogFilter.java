@@ -6,6 +6,8 @@ import org.apache.logging.log4j.core.filter.AbstractFilter;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
+import org.apache.logging.log4j.core.Filter.Result;
+
 class LogFilter extends AbstractFilter implements Filter {
     //Log4j loggers
     @Override

@@ -1,12 +1,12 @@
 package azmalent.cuneiform.lib.util;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 @SuppressWarnings("unused")
-public final class NbtUtil {
-    public static CompoundNBT getNestedCompound(CompoundNBT tag, String path) {
-        CompoundNBT currentTag = tag;
-        String[] tokens = path.split(".");
+public final class TagUtil {
+    public static CompoundTag getNestedCompound(CompoundTag tag, String path) {
+        CompoundTag currentTag = tag;
+        String[] tokens = path.split("\\.");
 
         for (int i = 0; i < tokens.length; i++) {
             String name = tokens[i];

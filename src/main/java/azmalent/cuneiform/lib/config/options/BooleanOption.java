@@ -3,7 +3,6 @@ package azmalent.cuneiform.lib.config.options;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
-import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public final class BooleanOption extends AbstractConfigOption<Boolean, Boolean> {

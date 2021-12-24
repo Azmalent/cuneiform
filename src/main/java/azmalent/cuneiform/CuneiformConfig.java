@@ -42,23 +42,6 @@ public final class CuneiformConfig {
                 "com.google.gson.JsonSyntaxException"
             ));
         }
-
-        public static class Tweaks extends Category {
-            @Name("Arrow Instant Effect Nerf")
-            @Comment("Scales healing and instant damage inflicted by tipped arrows, like in Combat test snapshots.")
-            public static BooleanOption tippedArrowPatch = new BooleanOption(true);
-
-            @Name("Arrow Instant Effect Scaling")
-            public static DoubleOption tippedArrowScaling = new DoubleOption(1/8d).inRange(1/8d, 1);
-
-            @Name("Shulker Shell Piercing")
-            @Comment("Allows arrows fired from crossbows enchanted with Piercing to damage closed shulkers.")
-            public static BooleanOption shulkerPiercingPatch = new BooleanOption(true);
-
-            @Name("Sponge Reduces Fall Damage")
-            @Comment("Allows sponge blocks to reduce fall damage by 80%, like hay bales.")
-            public static BooleanOption spongeFallDamagePatch = new BooleanOption(true);
-        }
     }
 
     public static class Server extends ServerConfigFile {

@@ -1,10 +1,10 @@
 package azmalent.cuneiform.lib.registry;
 
 import com.google.common.collect.Maps;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.DeferredRegister;
@@ -17,11 +17,11 @@ import java.util.function.Supplier;
 public class BlockRegistryHelper {
     public final DeferredRegister<Block> blocks;
     public final DeferredRegister<Item> items;
-    public final ItemGroup defaultTab;
+    public final CreativeModeTab defaultTab;
 
     private final Map<BlockEntry, BlockRenderType> renderTypes = Maps.newHashMap();
 
-    public BlockRegistryHelper(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry, ItemGroup defaultCreativeTab) {
+    public BlockRegistryHelper(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry, CreativeModeTab defaultCreativeTab) {
         blocks = blockRegistry;
         items = itemRegistry;
         defaultTab = defaultCreativeTab;
@@ -48,7 +48,7 @@ public class BlockRegistryHelper {
         for (Map.Entry<BlockEntry, BlockRenderType> entry : renderTypes.entrySet()) {
             BlockEntry blockEntry = entry.getKey();
             BlockRenderType renderType = entry.getValue();
-            RenderTypeLookup.setRenderLayer(blockEntry.getBlock(), renderType.get());
+            ItemBlockRenderTypes.setRenderLayer(blockEntry.getBlock(), renderType.get());
         }
     }
 }

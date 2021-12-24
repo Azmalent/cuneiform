@@ -2,33 +2,33 @@ package azmalent.cuneiform.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.arguments.DimensionArgument;
-import net.minecraft.command.arguments.Vec3Argument;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.DimensionArgument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 
 public final class DimensionTeleportCommand extends AbstractCommand {
     @Override
-    public void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralCommandNode<CommandSource> node = dispatcher.register(
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralCommandNode<CommandSourceStack> node = dispatcher.register(
             literal("dimteleport")
-                .requires(player -> player.hasPermissionLevel(2))
+                .requires(player -> player.hasPermission(2))
                 .then(
-                    argument("dimension", DimensionArgument.getDimension())
+                    argument("dimension", DimensionArgument.dimension())
                     .executes(context -> {
-                        ServerPlayerEntity player = context.getSource().asPlayer();
-                        ServerWorld dimension = DimensionArgument.getDimensionArgument(context, "dimension");
+                        ServerPlayer player = context.getSource().getPlayerOrException();
+                        ServerLevel dimension = DimensionArgument.getDimension(context, "dimension");
                         return teleportPlayer(player, dimension);
                     })
                     .then(
                         argument("position", Vec3Argument.vec3())
                         .executes(context -> {
-                            ServerPlayerEntity player = context.getSource().asPlayer();
-                            ServerWorld dimension = DimensionArgument.getDimensionArgument(context, "dimension");
-                            Vector3d pos = Vec3Argument.getVec3(context, "position");
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            ServerLevel dimension = DimensionArgument.getDimension(context, "dimension");
+                            Vec3 pos = Vec3Argument.getVec3(context, "position");
                             return teleportPlayer(player, dimension, pos);
                         })
                     )
@@ -38,12 +38,12 @@ public final class DimensionTeleportCommand extends AbstractCommand {
         dispatcher.register(literal("dimtp").redirect(node));
     }
 
-    private static int teleportPlayer(ServerPlayerEntity player, ServerWorld dimension) {
-        return teleportPlayer(player, dimension, player.getPositionVec());
+    private static int teleportPlayer(ServerPlayer player, ServerLevel dimension) {
+        return teleportPlayer(player, dimension, player.position());
     }
 
-    private static int teleportPlayer(ServerPlayerEntity player, ServerWorld dimension, Vector3d pos) {
-        player.teleport(dimension, pos.x, pos.y, pos.z, player.rotationYaw, player.rotationPitch);
+    private static int teleportPlayer(ServerPlayer player, ServerLevel dimension, Vec3 pos) {
+        player.teleportTo(dimension, pos.x, pos.y, pos.z, player.getYRot(), player.getXRot());
         return 1;
     }
 }

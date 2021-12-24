@@ -1,8 +1,8 @@
 package azmalent.cuneiform.common.event;
 
 import com.google.common.collect.Maps;
-import net.minecraft.item.Item;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
 public class FuelHandler {
     private static final Map<Item, Integer> FUELS = Maps.newHashMap();
 
-    public static void registerFuel(IItemProvider itemProvider, int duration) {
+    public static void registerFuel(ItemLike itemProvider, int duration) {
         FUELS.put(itemProvider.asItem(), duration);
     }
 

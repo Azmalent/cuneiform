@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public final class ReflectionUtil {
-    public static Class tryGetClass(@Nonnull String name) {
+    public static Class<?> tryGetClass(@Nonnull String name) {
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException e) {
@@ -21,7 +21,7 @@ public final class ReflectionUtil {
         }
     }
 
-    public static Field tryGetField(@Nonnull String name, @Nonnull Class clazz) {
+    public static Field tryGetField(@Nonnull String name, @Nonnull Class<?> clazz) {
         try {
             return clazz.getField(name);
         } catch (NoSuchFieldException e) {
@@ -29,6 +29,7 @@ public final class ReflectionUtil {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getSingletonInstance(@Nonnull Class<T> clazz) {
         Field instanceField = tryGetField("INSTANCE", clazz);
         if (instanceField != null && instanceField.getType().equals(clazz)) {
@@ -43,7 +44,7 @@ public final class ReflectionUtil {
     }
 
     @Nonnull
-    public static <TAnnotation extends Annotation> TAnnotation getAnnotation(@Nonnull Class clazz, @Nonnull Class<TAnnotation> annotationClass) {
+    public static <TAnnotation extends Annotation> TAnnotation getAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<TAnnotation> annotationClass) {
         TAnnotation annotation = (TAnnotation) clazz.getAnnotation(annotationClass);
         if (annotation != null) return annotation;
 
@@ -57,9 +58,7 @@ public final class ReflectionUtil {
 
         ModFileScanData scanData = ModList.get().getModFileById(modid).getFile().getScanResult();
         return scanData.getAnnotations().stream()
-                .filter(annotationData -> annotationData.getAnnotationType().equals(requiredType))
+                .filter(annotationData -> annotationData.annotationType().equals(requiredType))
                 .collect(Collectors.toList());
     }
-
-
 }
