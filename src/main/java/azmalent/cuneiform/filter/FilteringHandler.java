@@ -7,7 +7,7 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.util.regex.Pattern;
 
-public class FilteringUtil {
+public class FilteringHandler {
     public static void applyLogFilter() {
         LogFilter filter = new LogFilter();
 

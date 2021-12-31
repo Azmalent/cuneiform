@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -33,8 +34,9 @@ public final class DataUtil {
         ComposterBlock.COMPOSTABLES.put(item.get(), value);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static void addLoot(LootTable table, LootPoolEntryContainer... addedEntries) {
-        List<LootPool> pools = table.pools;
+        List<LootPool> pools = ObfuscationReflectionHelper.getPrivateValue(LootTable.class, table, "f_79109_");
         if (!pools.isEmpty() && addedEntries.length > 0) {
             LootPool pool = pools.get(0);
             LootPoolEntryContainer[] entries = pool.entries;

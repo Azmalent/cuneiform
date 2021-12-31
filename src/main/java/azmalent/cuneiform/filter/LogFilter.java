@@ -6,18 +6,16 @@ import org.apache.logging.log4j.core.filter.AbstractFilter;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
-import org.apache.logging.log4j.core.Filter.Result;
-
 class LogFilter extends AbstractFilter implements Filter {
     //Log4j loggers
     @Override
     public Result filter(LogEvent event) {
         String line = String.format("[%s]: %s", event.getLoggerName(), event.getMessage().getFormattedMessage());
 
-        boolean isLoggable = FilteringUtil.isLoggable(line);
+        boolean isLoggable = FilteringHandler.isLoggable(line);
         if (isLoggable) {
             Throwable exception = event.getThrown();
-            FilteringUtil.truncateException(exception);
+            FilteringHandler.truncateException(exception);
         }
 
         return isLoggable ? Result.NEUTRAL : Result.DENY;
@@ -29,10 +27,10 @@ class LogFilter extends AbstractFilter implements Filter {
     public boolean isLoggable(LogRecord record) {
         String line = String.format("[%s]: %s", record.getLoggerName(), record.getMessage());
 
-        boolean isLoggable = FilteringUtil.isLoggable(line);
+        boolean isLoggable = FilteringHandler.isLoggable(line);
         if (isLoggable) {
             Throwable exception = record.getThrown();
-            FilteringUtil.truncateException(exception);
+            FilteringHandler.truncateException(exception);
         }
         return isLoggable;
     }

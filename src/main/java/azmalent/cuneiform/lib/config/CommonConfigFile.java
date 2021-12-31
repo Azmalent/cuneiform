@@ -1,13 +1,15 @@
 package azmalent.cuneiform.lib.config;
 
+import net.minecraftforge.fml.config.ModConfig.Type;
+
 public abstract class CommonConfigFile extends AbstractConfigFile {
     protected CommonConfigFile(String modid) {
         super(modid);
     }
 
     @Override
-    protected net.minecraftforge.fml.config.ModConfig.Type getConfigType() {
-        return net.minecraftforge.fml.config.ModConfig.Type.COMMON;
+    protected Type getConfigType() {
+        return Type.COMMON;
     }
 
     @Override

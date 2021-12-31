@@ -12,11 +12,11 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("rawtypes")
-public class ModCompatUtil {
+@SuppressWarnings({"rawtypes", "unused"})
+public class ModIntegrationManager {
     @SuppressWarnings("unchecked")
-    public static void initModProxies(Class modCompatClass, String modid) {
-        Object instance = ReflectionUtil.getSingletonInstance(modCompatClass);
+    public static void initProxies(Class modCompatClass, String modid) {
+        Object instance = ReflectionUtil.getSingletonInstanceOrNull(modCompatClass);
 
         Map<String, Field> proxyFields = findProxyFields(modCompatClass);
         Map<String, Class> dummies = getDummies(modid);
@@ -53,7 +53,7 @@ public class ModCompatUtil {
         Map<String, Class> result = Maps.newHashMap();
         for (AnnotationData data : annotationData) {
             String targetModid = (String) data.annotationData().get("value");
-            Class clazz = ReflectionUtil.tryGetClass(data.clazz().getClassName());
+            Class clazz = ReflectionUtil.getClassOrNull(data.clazz().getClassName());
             result.put(targetModid, clazz);
         }
 
@@ -65,7 +65,7 @@ public class ModCompatUtil {
         for (AnnotationData data : annotationData) {
             String modid = (String) data.annotationData().get("value");
             if (modid.equals(targetModid)) {
-                return ReflectionUtil.tryGetClass(data.clazz().getClassName());
+                return ReflectionUtil.getClassOrNull(data.clazz().getClassName());
             }
         }
 

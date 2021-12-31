@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 public abstract class AbstractConfigObject {
     protected final void initFields(ForgeConfigSpec.Builder builder) {
         Class<?> clazz = this.getClass();
-        AbstractConfigObject instance = ReflectionUtil.getSingletonInstance(this.getClass());
+        AbstractConfigObject instance = ReflectionUtil.getSingletonInstanceOrNull(this.getClass());
 
         for (Field field : clazz.getFields()) {
             try {
@@ -44,7 +44,7 @@ public abstract class AbstractConfigObject {
 
     protected void initFlags(String modid) {
         Class<?> clazz = this.getClass();
-        AbstractConfigObject instance = ReflectionUtil.getSingletonInstance(this.getClass());
+        AbstractConfigObject instance = ReflectionUtil.getSingletonInstanceOrNull(this.getClass());
 
         for (Field field : clazz.getFields()) {
             try {
@@ -62,7 +62,7 @@ public abstract class AbstractConfigObject {
         for (Class<?> innerClass : clazz.getDeclaredClasses()) {
             if (Category.class.isAssignableFrom(innerClass)) {
                 try {
-                    Category category = (Category) innerClass.asSubclass(Category.class).newInstance();
+                    Category category = innerClass.asSubclass(Category.class).newInstance();
                     category.initFlags(modid);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();

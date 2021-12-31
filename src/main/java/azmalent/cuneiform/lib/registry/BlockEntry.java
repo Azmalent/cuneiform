@@ -1,6 +1,5 @@
 package azmalent.cuneiform.lib.registry;
 
-import azmalent.cuneiform.common.item.CeilingOrFloorItem;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -81,19 +80,19 @@ public class BlockEntry implements ItemLike {
         protected boolean noItemForm = false;
         protected BlockRenderType renderType = BlockRenderType.SOLID;
 
-        protected BlockRegistryHelper helper;
+        protected RegistryHelper helper;
 
-        public Builder(BlockRegistryHelper helper, String id, Supplier<? extends Block> constructor) {
+        public Builder(RegistryHelper helper, String id, Supplier<? extends Block> constructor) {
             this.helper = helper;
             this.id = id;
             this.constructor = constructor;
         }
 
-        public Builder(BlockRegistryHelper helper, String id, Function<Block.Properties, ? extends Block> constructor, Block.Properties properties) {
+        public Builder(RegistryHelper helper, String id, Function<Block.Properties, ? extends Block> constructor, Block.Properties properties) {
             this(helper, id, () -> constructor.apply(properties));
         }
 
-        public Builder(BlockRegistryHelper helper, String id, Block.Properties properties) {
+        public Builder(RegistryHelper helper, String id, Block.Properties properties) {
             this(helper, id, () -> new Block(properties));
         }
 
@@ -112,7 +111,7 @@ public class BlockEntry implements ItemLike {
             if (postInitCallback != null) postInitCallback.accept(entry);
 
             if (renderType != BlockRenderType.SOLID) {
-                helper.setRenderType(entry, renderType);
+                helper.setBlockRenderType(entry, renderType);
             }
 
             return entry;
@@ -146,14 +145,6 @@ public class BlockEntry implements ItemLike {
 
         public Builder withWallOrFloorItem(BlockEntry wallBlock, CreativeModeTab group) {
             return this.withWallOrFloorItem(wallBlock, new Item.Properties().tab(group));
-        }
-
-        public Builder withCeilingOrFloorItem(BlockEntry floorBlock, Item.Properties properties) {
-            return this.withBlockItem(block -> new CeilingOrFloorItem(floorBlock.getBlock(), block, properties));
-        }
-
-        public Builder withCeilingOrFloorItem(BlockEntry floorBlock, CreativeModeTab group) {
-            return this.withCeilingOrFloorItem(floorBlock, new Item.Properties().tab(group));
         }
 
         public Builder withItemProperties(Item.Properties properties) {

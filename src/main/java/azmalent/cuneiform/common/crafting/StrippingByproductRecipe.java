@@ -24,7 +24,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class StrippingByproductRecipe extends AbstractRecipe<RecipeWrapper> {
     public static final ResourceLocation TYPE_ID = Cuneiform.prefix("stripping_byproduct");
-    public static final RecipeType<StrippingByproductRecipe> TYPE = new ModRecipeType<>();
+    public static final ModRecipeType<StrippingByproductRecipe> TYPE = new ModRecipeType<>();
 
     private final Block block;
     private final ItemStack output;

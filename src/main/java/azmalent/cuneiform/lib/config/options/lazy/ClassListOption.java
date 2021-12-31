@@ -12,7 +12,7 @@ public final class ClassListOption extends LazyListOption<Class> {
     }
 
     public ClassListOption(List<String> defaultValue) {
-        super(defaultValue, ReflectionUtil::tryGetClass);
+        super(defaultValue, ReflectionUtil::getClassOrNull);
     }
 
     public boolean containsParent(Object object) {

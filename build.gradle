@@ -22,9 +22,9 @@ version = "${minecraft_version}-${mod_version}"
 group = "azmalent.${modid}"
 archivesBaseName = modid
 
-compileJava.options.compilerArgs << "-Xlint:all,-classfile,-processing,-deprecation"
-
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+compileJava.options.compilerArgs << "-Xlint:all,-deprecation"
+
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
@@ -76,6 +76,7 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {
@@ -97,6 +98,10 @@ jar {
     }
 }
 
+mixin {
+    add sourceSets.main, "${modid}.mixins.refmap.json"
+}
+
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
@@ -109,13 +114,8 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
-}
 
-sourceSets {
-    main {
-        //output.resourcesDir = output.classesDir
-        ext.refMap = "cuneiform.mixins.refmap.json"
-    }
+    duplicatesStrategy 'include'
 }
 
 static def parseConfig(File config) {
