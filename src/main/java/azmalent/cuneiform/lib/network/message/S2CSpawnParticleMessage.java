@@ -11,7 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 @SuppressWarnings("unused")
 public record S2CSpawnParticleMessage(
-        ResourceLocation name,
+        ResourceLocation particleId,
         double xPos, double yPos, double zPos,
         double xSpeed, double ySpeed, double zSpeed) implements IMessage.ServerToClient {
 
@@ -25,10 +25,10 @@ public record S2CSpawnParticleMessage(
 
     @Override
     @SuppressWarnings("ConstantConditions")
-    public void handle(NetworkEvent.Context context) {
+    public void onReceive(NetworkEvent.Context context) {
         Level level = Minecraft.getInstance().level;
-        SimpleParticleType type = (SimpleParticleType) ForgeRegistries.PARTICLE_TYPES.getValue(name);
-        if (type != null) {
+        SimpleParticleType type = (SimpleParticleType) ForgeRegistries.PARTICLE_TYPES.getValue(particleId);
+        if (level != null && type != null) {
             level.addParticle(type, xPos, yPos, zPos, xSpeed, ySpeed, zSpeed);
         }
     }

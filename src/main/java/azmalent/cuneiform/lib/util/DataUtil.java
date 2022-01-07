@@ -1,8 +1,6 @@
 package azmalent.cuneiform.lib.util;
 
-import azmalent.cuneiform.lib.registry.BlockEntry;
 import azmalent.cuneiform.mixin.accessor.FireBlockAccessor;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -17,21 +15,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public final class DataUtil {
-    public static void registerFlammable(Block block, int flameOdds, int burnOdds) {
+    public static void registerFlammable(Supplier<? extends Block> block, int flameOdds, int burnOdds) {
         FireBlockAccessor fire = (FireBlockAccessor) Blocks.FIRE;
-        fire.cuneiform_setFlammable(block, flameOdds, burnOdds);
-    }
-
-    public static void registerFlammable(BlockEntry blockEntry, int flameOdds, int burnOdds) {
-        registerFlammable(blockEntry.getBlock(), flameOdds, burnOdds);
+        fire.cuneiform_setFlammable(block.get(), flameOdds, burnOdds);
     }
 
     public static void registerCompostable(ItemLike itemProvider, float value) {
         ComposterBlock.COMPOSTABLES.put(itemProvider, value);
-    }
-
-    public static void registerCompostable(Supplier<? extends Item> item, float value) {
-        ComposterBlock.COMPOSTABLES.put(item.get(), value);
     }
 
     @SuppressWarnings("ConstantConditions")

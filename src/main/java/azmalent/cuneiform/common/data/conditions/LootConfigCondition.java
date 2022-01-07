@@ -1,5 +1,5 @@
 
-package azmalent.cuneiform.lib.config.data;
+package azmalent.cuneiform.common.data.conditions;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -10,13 +10,13 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 import javax.annotation.Nonnull;
 
-public class LootConfigCondition implements LootItemCondition {
-    private final String modid;
-    private final String flag;
+public record LootConfigCondition(String modid, String flag) implements LootItemCondition {
+    public static LootItemConditionType TYPE = new LootItemConditionType(new LootConfigCondition.Serializer());
 
-    public LootConfigCondition(String modid, String flag) {
-        this.modid = modid;
-        this.flag = flag;
+    @Nonnull
+    @Override
+    public LootItemConditionType getType() {
+        return TYPE;
     }
 
     @Override
@@ -24,13 +24,8 @@ public class LootConfigCondition implements LootItemCondition {
         return ConfigFlagManager.getFlag(modid, flag);
     }
 
-    @Nonnull
-    @Override
-    public LootItemConditionType getType() {
-        return ConfigFlagManager.LOOT_CONFIG_CONDITION;
-    }
-
     public static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<LootConfigCondition> {
+
         @Override
         public void serialize(@Nonnull JsonObject json, @Nonnull LootConfigCondition value, @Nonnull JsonSerializationContext context) {
             json.addProperty("config", value.modid + ":" + value.flag);

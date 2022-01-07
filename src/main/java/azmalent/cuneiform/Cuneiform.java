@@ -4,10 +4,10 @@ import azmalent.cuneiform.command.DimensionTeleportCommand;
 import azmalent.cuneiform.command.KillAllCommand;
 import azmalent.cuneiform.command.KillItemsCommand;
 import azmalent.cuneiform.common.crafting.StrippingByproductRecipe;
-import azmalent.cuneiform.common.event.FuelHandler;
+import azmalent.cuneiform.common.data.FuelHandler;
+import azmalent.cuneiform.common.data.WanderingTraderHandler;
 import azmalent.cuneiform.filter.FilteringHandler;
-import azmalent.cuneiform.lib.network.CuneiformChannel;
-import azmalent.cuneiform.lib.network.message.S2CSpawnParticleMessage;
+import azmalent.cuneiform.lib.network.CuneiformNetwork;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -26,12 +26,6 @@ public final class Cuneiform {
     public static final String MODID = "cuneiform";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-    public static final CuneiformChannel CHANNEL = new CuneiformChannel(prefix("channel"), 1);
-
-    static {
-        CHANNEL.registerMessage(S2CSpawnParticleMessage.class);
-    }
-
     public Cuneiform() {
         CuneiformConfig.init();
         if (CuneiformConfig.Common.Filtering.enabled.get()) {
@@ -42,6 +36,9 @@ public final class Cuneiform {
 
         MinecraftForge.EVENT_BUS.addListener(Cuneiform::registerCommands);
         MinecraftForge.EVENT_BUS.addListener(FuelHandler::getBurnTime);
+        MinecraftForge.EVENT_BUS.addListener(WanderingTraderHandler::registerTrades);
+
+        CuneiformNetwork.registerMessages();
     }
 
     private static void registerRecipeTypes(RegistryEvent.Register<RecipeSerializer<?>> event) {

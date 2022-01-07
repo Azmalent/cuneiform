@@ -1,55 +1,43 @@
 package azmalent.cuneiform.lib.registry;
 
+import azmalent.cuneiform.lib.registry.RegistryHelper.BlockRenderType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static net.minecraftforge.registries.ForgeRegistries.*;
+
 @SuppressWarnings("unused")
-public class BlockEntry implements ItemLike {
+public final class BlockEntry implements Supplier<Block>, ItemLike {
     public final RegistryObject<Block> block;
-    public final RegistryObject<Item> item;
 
-    private BlockEntry() {
-        block = null;
-        item = null;
+    private BlockEntry(RegistryHelper registryHelper, String id, Supplier<? extends Block> constructor) {
+        block = registryHelper.getOrCreateRegistry(BLOCKS).register(id, constructor);
     }
 
-    private BlockEntry(DeferredRegister<Block> blockRegistry, String id, Supplier<? extends Block> constructor) {
-        block = blockRegistry.register(id, constructor);
-        item = null;
-    }
-
-    private BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
-                      String id, Supplier<? extends Block> constructor, CreativeModeTab creativeTab) {
-        this(blockRegistry, itemRegistry, id, constructor, (block) ->
+    private BlockEntry(RegistryHelper registryHelper,String id, Supplier<? extends Block> constructor, CreativeModeTab creativeTab) {
+        this(registryHelper, id, constructor, (block) ->
            new BlockItem(block, new Item.Properties().tab(creativeTab))
         );
     }
 
-    private BlockEntry(DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry,
-                      String id, Supplier<? extends Block> constructor, Function<Block, ? extends BlockItem> blockItemConstructor) {
-        block = blockRegistry.register(id, constructor);
-        item = itemRegistry.register(id, () -> blockItemConstructor.apply(block.get()));
+    private BlockEntry(RegistryHelper registryHelper, String id, Supplier<? extends Block> constructor, Function<Block, ? extends BlockItem> itemConstructor) {
+        block = registryHelper.getOrCreateRegistry(BLOCKS).register(id, constructor);
+        registryHelper.getOrCreateRegistry(ITEMS).register(id, () -> itemConstructor.apply(block.get()));
     }
 
     public boolean hasItemForm() {
-        return item != null;
+        return block.get().asItem() != Items.AIR;
     }
 
-    public Block getBlock() {
-        return block.get();
-    }
-
-    public BlockState getDefaultState() {
+    public BlockState defaultBlockState() {
         return block.get().defaultBlockState();
     }
 
@@ -62,25 +50,30 @@ public class BlockEntry implements ItemLike {
     }
 
     @Override
+    public Block get() {
+        return block.get();
+    }
+
+    @Override
     @Nonnull
     public Item asItem() {
-        if (item == null) {
-            throw new NullPointerException(String.format("The block %s doesn't have an item form!", getBlock().getRegistryName()));
+        if (!hasItemForm()) {
+            throw new NullPointerException(String.format("The block %s doesn't have an item form!", get().getRegistryName()));
         }
 
-        return item.get();
+        return block.get().asItem();
     }
 
     @SuppressWarnings("ConstantConditions")
     public static class Builder {
+        protected RegistryHelper helper;
+
         protected String id;
         protected Supplier<? extends Block> constructor;
         protected Function<Block, ? extends BlockItem> blockItemConstructor;
-        protected Consumer<BlockEntry> postInitCallback;
         protected boolean noItemForm = false;
-        protected BlockRenderType renderType = BlockRenderType.SOLID;
 
-        protected RegistryHelper helper;
+        protected BlockRenderType renderType = BlockRenderType.SOLID;
 
         public Builder(RegistryHelper helper, String id, Supplier<? extends Block> constructor) {
             this.helper = helper;
@@ -99,16 +92,14 @@ public class BlockEntry implements ItemLike {
         public BlockEntry build() {
             BlockEntry entry;
             if (noItemForm) {
-                entry = new BlockEntry(helper.blocks, id, constructor);
+                entry = new BlockEntry(helper, id, constructor);
             }
             else if (blockItemConstructor != null) {
-                entry = new BlockEntry(helper.blocks, helper.items, id, constructor, blockItemConstructor);
+                entry = new BlockEntry(helper, id, constructor, blockItemConstructor);
             }
             else {
-                entry = new BlockEntry(helper.blocks, helper.items, id, constructor, helper.defaultTab);
+                entry = new BlockEntry(helper, id, constructor, helper.defaultTab);
             }
-
-            if (postInitCallback != null) postInitCallback.accept(entry);
 
             if (renderType != BlockRenderType.SOLID) {
                 helper.setBlockRenderType(entry, renderType);
@@ -117,69 +108,66 @@ public class BlockEntry implements ItemLike {
             return entry;
         }
 
-        public Builder withBlockItem(Function<Block, ? extends BlockItem> blockItemConstructor) {
+        //Item form
+        public Builder blockItem(Function<Block, ? extends BlockItem> blockItemConstructor) {
             this.blockItemConstructor = blockItemConstructor;
             return this;
         }
 
-        public Builder withBlockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, Item.Properties properties) {
+        public Builder blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, Item.Properties properties) {
             this.blockItemConstructor = block -> blockItemConstructor.apply(block, properties);
             return this;
         }
 
-        public Builder withBlockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, CreativeModeTab group) {
-            return this.withBlockItem(blockItemConstructor, new Item.Properties().tab(group));
+        public Builder blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, CreativeModeTab group) {
+            return this.blockItem(blockItemConstructor, new Item.Properties().tab(group));
         }
 
-        public Builder withTallBlockItem(Item.Properties properties) {
-            return this.withBlockItem(DoubleHighBlockItem::new, properties);
+        public Builder tallBlockItem(Item.Properties properties) {
+            return this.blockItem(DoubleHighBlockItem::new, properties);
         }
 
-        public Builder withTallBlockItem(CreativeModeTab group) {
-            return this.withBlockItem(DoubleHighBlockItem::new, group);
+        public Builder tallBlockItem(CreativeModeTab group) {
+            return this.blockItem(DoubleHighBlockItem::new, group);
         }
 
-        public Builder withWallOrFloorItem(BlockEntry wallBlock, Item.Properties properties) {
-            return this.withBlockItem(block -> new StandingAndWallBlockItem(wallBlock.getBlock(), block, properties));
+        public Builder wallOrFloorItem(BlockEntry wallBlock, Item.Properties properties) {
+            return this.blockItem(block -> new StandingAndWallBlockItem(wallBlock.get(), block, properties));
         }
 
-        public Builder withWallOrFloorItem(BlockEntry wallBlock, CreativeModeTab group) {
-            return this.withWallOrFloorItem(wallBlock, new Item.Properties().tab(group));
+        public Builder wallOrFloorItem(BlockEntry wallBlock, CreativeModeTab group) {
+            return this.wallOrFloorItem(wallBlock, new Item.Properties().tab(group));
         }
 
-        public Builder withItemProperties(Item.Properties properties) {
-            return this.withBlockItem(BlockItem::new, properties);
+        public Builder blockItem(Item.Properties properties) {
+            return this.blockItem(BlockItem::new, properties);
         }
 
-        public Builder inCreativeTab(CreativeModeTab group) {
-            return this.withItemProperties(new Item.Properties().tab(group));
+        public Builder blockItem(CreativeModeTab group) {
+            return this.blockItem(new Item.Properties().tab(group));
         }
 
-        public Builder withoutItemForm() {
+        public Builder noItemForm() {
             this.noItemForm = true;
             return this;
         }
 
-        public Builder withRenderType(BlockRenderType type) {
+        //Render types
+        public Builder renderType(BlockRenderType type) {
             this.renderType = type;
             return this;
         }
 
         public Builder cutoutRender() {
-            return this.withRenderType(BlockRenderType.CUTOUT);
+            return this.renderType(BlockRenderType.CUTOUT);
         }
 
         public Builder cutoutMippedRender() {
-            return this.withRenderType(BlockRenderType.CUTOUT_MIPPED);
+            return this.renderType(BlockRenderType.CUTOUT_MIPPED);
         }
 
         public Builder transculentRender() {
-            return this.withRenderType(BlockRenderType.TRANSCULENT);
-        }
-
-        public Builder onInit(Consumer<BlockEntry> callback) {
-            postInitCallback = callback;
-            return this;
+            return this.renderType(BlockRenderType.TRANSCULENT);
         }
     }
 }

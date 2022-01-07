@@ -1,4 +1,4 @@
-package azmalent.cuneiform.lib.compat;
+package azmalent.cuneiform.lib.integration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

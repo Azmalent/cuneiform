@@ -7,15 +7,7 @@ import java.util.Random;
 
 @SuppressWarnings("unused")
 public class WeightedList<T> {
-    private static class Node<T> {
-        protected final T value;
-        protected final int weight;
-
-        private Node(T value, int weight) {
-            this.value = value;
-            this.weight = weight;
-        }
-    }
+    private record Node<T>(T value, int weight) { }
 
     private final List<Node<T>> items = Lists.newArrayList();
     private int totalWeight = 0;
@@ -25,6 +17,14 @@ public class WeightedList<T> {
             throw new IllegalArgumentException("Weight must be positive!");
         } else if (weight == 0) {
             return;
+        }
+
+        for (Node<T> item : items) {
+            if (item.value.equals(value)) {
+                items.remove(item);
+                weight += item.weight;
+                break;
+            }
         }
 
         items.add(new Node<>(value, weight));
@@ -47,7 +47,7 @@ public class WeightedList<T> {
         return totalWeight == 0;
     }
 
-    public T getRandomItem(Random random) {
+    public T sample(Random random) {
         if (isEmpty()) return null;
 
         int i = random.nextInt(totalWeight);

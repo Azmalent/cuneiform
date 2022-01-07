@@ -6,6 +6,7 @@
         <autoDetectTypes>
           <platformType>FORGE</platformType>
           <platformType>MIXIN</platformType>
+          <platformType>MCP</platformType>
         </autoDetectTypes>
       </configuration>
     </facet>
@@ -37,7 +38,7 @@
     <orderEntry type="library" name="Gradle: net.minecraft:mappings_official:zip:1.18" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: cpw.mods:securejarhandler:0.9.54" level="project" />
     <orderEntry type="library" name="Gradle: org.openjdk.nashorn:nashorn-core:15.3" level="project" />
-    <orderEntry type="library" name="Gradle: cpw.mods:modlauncher:9.0.8" level="project" />
+    <orderEntry type="library" name="Gradle: cpw.mods:modlauncher:9.0.21" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm-commons:9.1" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm-util:9.1" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm-analysis:9.1" level="project" />
@@ -56,9 +57,9 @@
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.12.0" level="project" />
     <orderEntry type="library" name="Gradle: net.jodah:typetools:0.8.3" level="project" />
     <orderEntry type="library" name="Gradle: net.minecrell:terminalconsoleappender:1.2.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-core:2.15.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.logging.log4j:log4j-core:2.15.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-slf4j18-impl:2.15.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.15.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.logging.log4j:log4j-api:2.15.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jline:jline-reader:3.12.1" level="project" />
     <orderEntry type="library" name="Gradle: org.jline:jline-terminal:3.12.1" level="project" />
     <orderEntry type="library" name="Gradle: net.sf.jopt-simple:jopt-simple:5.0.4" level="project" />
@@ -105,7 +106,9 @@
     <orderEntry type="library" name="Gradle: org.antlr:antlr-runtime:3.5.2" level="project" />
     <orderEntry type="library" name="Gradle: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.0.4" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: cpw.mods:securejarhandler:0.9.59" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: cpw.mods:securejarhandler:0.9.61" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.logging.log4j:log4j-core:2.17.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.logging.log4j:log4j-api:2.17.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.lwjgl:lwjgl-jemalloc:natives-linux:3.2.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.lwjgl:lwjgl-openal:natives-linux:3.2.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.lwjgl:lwjgl-opengl:natives-linux:3.2.2" level="project" />

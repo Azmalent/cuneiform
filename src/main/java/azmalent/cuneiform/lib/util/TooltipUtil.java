@@ -75,7 +75,7 @@ public final class TooltipUtil {
 
                 tooltip.add((
                     new TranslatableComponent(
-                        String.format("attribute.modifier.%s.%i", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
+                        String.format("attribute.modifier.%s.%d", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
                         ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
                         new TranslatableComponent(pair.getFirst().getDescriptionId())
                     )

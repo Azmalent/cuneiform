@@ -1,6 +1,6 @@
 package azmalent.cuneiform.lib.config;
 
-import azmalent.cuneiform.lib.config.data.ConfigFlagManager;
+import azmalent.cuneiform.common.data.conditions.ConfigFlagManager;
 import azmalent.cuneiform.lib.config.options.AbstractConfigOption;
 import azmalent.cuneiform.lib.config.options.BooleanOption;
 import azmalent.cuneiform.lib.util.ReflectionUtil;

@@ -1,30 +1,28 @@
-package azmalent.cuneiform.lib.config.data;
+package azmalent.cuneiform.common.data.conditions;
 
 import azmalent.cuneiform.Cuneiform;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ModList;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
 public final class ConfigFlagManager {
-    public static LootItemConditionType LOOT_CONFIG_CONDITION = new LootItemConditionType(new LootConfigCondition.Serializer());
-
     public static final Map<String, Map<String, Boolean>> flagsByModid = new HashMap<>();
 
     static {
         ResourceLocation id = Cuneiform.prefix("config");
         CraftingHelper.register(new RecipeConfigCondition.Serializer(id));
 
-        Registry.register(Registry.LOOT_CONDITION_TYPE, id, LOOT_CONFIG_CONDITION);
+        Registry.register(Registry.LOOT_CONDITION_TYPE, id, LootConfigCondition.TYPE);
     }
 
     public static void putFlag(ResourceLocation flag, boolean value) {
-        String[] tokens = flag.toString().split(":", 2);
+        String[] tokens = StringUtils.split(flag.toString(), ":", 2);
         putFlag(tokens[0], tokens[1], value);
     }
 

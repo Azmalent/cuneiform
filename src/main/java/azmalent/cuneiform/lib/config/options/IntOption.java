@@ -1,7 +1,7 @@
 package azmalent.cuneiform.lib.config.options;
 
-import azmalent.cuneiform.lib.util.StringUtil;
 import net.minecraftforge.common.ForgeConfigSpec;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public final class IntOption extends AbstractConfigOption<Integer, Integer> {
         else if (allowedValues != null) {
             value = addComment(builder, field,
                     "Default: " + defaultValue,
-                    "Allowed values: [" + StringUtil.joinObjects(", ", allowedValues) + "]"
+                    "Allowed values: [" + StringUtils.join(allowedValues, ", ") + "]"
             ).defineInList(getName(field), defaultValue, allowedValues);
         }
         else {

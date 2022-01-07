@@ -36,7 +36,7 @@ public abstract class AbstractRecipe<T extends Container> implements Recipe<T> {
     }
 
     @Override
-    public boolean canCraftInDimensions(int i, int i1) {
+    public boolean canCraftInDimensions(int width, int height) {
         return false;
     }
 

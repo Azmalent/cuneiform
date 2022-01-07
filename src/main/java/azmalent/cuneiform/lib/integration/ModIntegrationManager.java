@@ -1,4 +1,4 @@
-package azmalent.cuneiform.lib.compat;
+package azmalent.cuneiform.lib.integration;
 
 import azmalent.cuneiform.Cuneiform;
 import azmalent.cuneiform.lib.util.ReflectionUtil;
@@ -15,11 +15,11 @@ import java.util.Map;
 @SuppressWarnings({"rawtypes", "unused"})
 public class ModIntegrationManager {
     @SuppressWarnings("unchecked")
-    public static void initProxies(Class modCompatClass, String modid) {
-        Object instance = ReflectionUtil.getSingletonInstanceOrNull(modCompatClass);
+    public static void initModProxies(Class containerClass, String modid) {
+        Object instance = ReflectionUtil.getSingletonInstanceOrNull(containerClass);
 
-        Map<String, Field> proxyFields = findProxyFields(modCompatClass);
-        Map<String, Class> dummies = getDummies(modid);
+        Map<String, Field> proxyFields = findProxyFields(containerClass);
+        Map<String, Class<?>> dummies = getDummies(modid);
 
         for (Map.Entry<String, Field> proxyField : proxyFields.entrySet()) {
             String targetModid = proxyField.getKey();
@@ -48,12 +48,12 @@ public class ModIntegrationManager {
         return proxies;
     }
 
-    private static <TAnnotation extends Annotation> Map<String, Class> getDummies(String modid) {
-        List<AnnotationData> annotationData = ReflectionUtil.getAnnotationDataFromMod(modid, ModProxyDummy.class);
-        Map<String, Class> result = Maps.newHashMap();
+    private static <TAnnotation extends Annotation> Map<String, Class<?>> getDummies(String modid) {
+        List<AnnotationData> annotationData = ReflectionUtil.getAnnotationDataFromMod(modid, IntegrationDummy.class);
+        Map<String, Class<?>> result = Maps.newHashMap();
         for (AnnotationData data : annotationData) {
             String targetModid = (String) data.annotationData().get("value");
-            Class clazz = ReflectionUtil.getClassOrNull(data.clazz().getClassName());
+            Class<?> clazz = ReflectionUtil.getClassOrNull(data.clazz().getClassName());
             result.put(targetModid, clazz);
         }
 
@@ -61,7 +61,7 @@ public class ModIntegrationManager {
     }
 
     private static Class getImpl(String thisModid, String targetModid) {
-        List<AnnotationData> annotationData = ReflectionUtil.getAnnotationDataFromMod(thisModid, ModProxyImpl.class);
+        List<AnnotationData> annotationData = ReflectionUtil.getAnnotationDataFromMod(thisModid, IntegrationImpl.class);
         for (AnnotationData data : annotationData) {
             String modid = (String) data.annotationData().get("value");
             if (modid.equals(targetModid)) {
@@ -72,18 +72,18 @@ public class ModIntegrationManager {
         return null;
     }
 
-    private static Object createProxy(String thisModid, String targetModid, Class dummyClass, Class fieldType) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    private static Object createProxy(String thisModid, String targetModid, Class<?> dummyClass, Class<?> fieldType) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         if (dummyClass == null) {
-            if (fieldType != IModIntegration.class) {
+            if (fieldType != IModProxy.class) {
                 throw new ClassNotFoundException("Missing dummy proxy for " + targetModid);
             }
 
-            dummyClass = BasicModDummy.class;
+            dummyClass = IModProxy.Dummy.class;
         }
 
         try {
             if (ModList.get().isLoaded(targetModid)) {
-                Class implClass = getImpl(thisModid, targetModid);
+                Class<?> implClass = getImpl(thisModid, targetModid);
                 if (implClass == null) {
                     throw new ClassNotFoundException("Failed to instantiate  " + targetModid);
                 }

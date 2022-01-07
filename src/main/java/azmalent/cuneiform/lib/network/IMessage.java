@@ -1,13 +1,12 @@
 package azmalent.cuneiform.lib.network;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 
 @SuppressWarnings("unused")
 public interface IMessage {
     NetworkDirection getDirection();
-    void handle(NetworkEvent.Context context);
+    void onReceive(NetworkEvent.Context context);
 
     interface ClientToServer extends IMessage {
         @Override

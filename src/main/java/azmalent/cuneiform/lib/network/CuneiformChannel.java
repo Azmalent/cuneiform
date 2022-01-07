@@ -1,6 +1,5 @@
 package azmalent.cuneiform.lib.network;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.util.FakePlayer;
@@ -9,9 +8,6 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class CuneiformChannel {
@@ -24,14 +20,18 @@ public class CuneiformChannel {
     }
 
     public <T extends Record & IMessage> void registerMessage(Class<T> clazz) {
-        registerMessage(clazz, SerializationHandler::encodeMessage, buffer -> SerializationHandler.decodeMessage(clazz, buffer));
+        registerMessage(clazz, buffer -> SerializationHandler.decodeMessage(clazz, buffer), SerializationHandler::encodeMessage);
     }
 
-    public <T extends Record & IMessage> void registerMessage(Class<T> clazz, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder) {
-        channel.<T>registerMessage(index++, clazz, encoder, decoder, (message, contextSupplier) -> {
-            NetworkEvent.Context context = contextSupplier.get();
-            if (context.getDirection() == message.getDirection()) {
-                context.enqueueWork(() -> message.handle(context));
+	public <T extends IMessage> void registerMessage(Class<T> clazz, INetworkSerializer<T> serializer) {
+		registerMessage(clazz, serializer::read, serializer::write);
+	}
+
+    public <T extends IMessage> void registerMessage(Class<T> clazz, NetworkReader<T> decoder, NetworkWriter<T> encoder) {
+        channel.<T>registerMessage(index++, clazz, (value, buf) -> encoder.write(buf, value), decoder, (msg, sup) -> {
+            NetworkEvent.Context context = sup.get();
+            if (context.getDirection() == msg.getDirection()) {
+                context.enqueueWork(() -> msg.onReceive(context));
             }
 
             context.setPacketHandled(true);

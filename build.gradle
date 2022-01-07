@@ -13,8 +13,6 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
-apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
-
 ext.configFile = file('gradle.properties')
 ext.config = parseConfig(configFile)
 
@@ -74,9 +72,29 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.main, "${modid}.mixins.refmap.json"
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        include 'META-INF/mods.toml'
+
+        expand 'mod_name': mod_name, 'mod_version': project.version,
+                'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
+                'fml_min': fml_min, 'forge_version': forge_version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'META-INF/mods.toml'
+    }
+
+    duplicatesStrategy 'include'
 }
 
 jar {
@@ -96,26 +114,6 @@ jar {
                 'ForceLoadAsMod': 'true'
         ])
     }
-}
-
-mixin {
-    add sourceSets.main, "${modid}.mixins.refmap.json"
-}
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-
-        expand 'mod_name': mod_name, 'mod_version': project.version,
-                'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
-                'fml_min': fml_min, 'forge_version': forge_version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
-
-    duplicatesStrategy 'include'
 }
 
 static def parseConfig(File config) {

@@ -1,4 +1,4 @@
-package azmalent.cuneiform.common.event;
+package azmalent.cuneiform.common.data;
 
 import com.google.common.collect.Maps;
 import net.minecraft.world.item.Item;
@@ -7,11 +7,14 @@ import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 import java.util.Map;
 
-public class FuelHandler {
+@SuppressWarnings("unused")
+public final class FuelHandler {
     private static final Map<Item, Integer> FUELS = Maps.newHashMap();
 
-    public static void registerFuel(ItemLike itemProvider, int duration) {
-        FUELS.put(itemProvider.asItem(), duration);
+    public static void registerFuel(float itemsPerFuel, ItemLike... fuels) {
+        for (ItemLike item : fuels) {
+            FUELS.put(item.asItem(), (int) (itemsPerFuel * 200));
+        }
     }
 
     public static void getBurnTime(FurnaceFuelBurnTimeEvent event) {
