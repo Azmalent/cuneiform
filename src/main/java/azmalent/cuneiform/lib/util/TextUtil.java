@@ -15,13 +15,23 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 @SuppressWarnings("unused")
-public final class TooltipUtil {
+public final class TextUtil {
+    public static String splitCamelCase(String string) {
+        String[] words = StringUtils.splitByCharacterTypeCamelCase(string);
+        if (words.length > 0) {
+            words[0] = StringUtils.capitalize(words[0]);
+        }
+
+        return StringUtils.join(words, ' ');
+    }
+
     public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip) {
         addEffectsTooltip(effects, tooltip, 1);
     }

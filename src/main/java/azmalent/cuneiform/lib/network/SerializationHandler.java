@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.SerializationException;
@@ -45,6 +46,7 @@ public final class SerializationHandler {
         registerSerializer(double.class, FriendlyByteBuf::readDouble, FriendlyByteBuf::writeDouble);
         registerSerializer(boolean.class, FriendlyByteBuf::readBoolean, FriendlyByteBuf::writeBoolean);
         registerSerializer(String.class, buf -> buf.readUtf(32767), FriendlyByteBuf::writeUtf);
+        registerSerializer(Component.class, FriendlyByteBuf::readComponent, FriendlyByteBuf::writeComponent);
         registerSerializer(ResourceLocation.class, FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::writeResourceLocation);
         registerSerializer(ItemStack.class, FriendlyByteBuf::readItem, (buf, stack) -> buf.writeItemStack(stack, false));
         registerSerializer(CompoundTag.class, FriendlyByteBuf::readNbt, FriendlyByteBuf::writeNbt);

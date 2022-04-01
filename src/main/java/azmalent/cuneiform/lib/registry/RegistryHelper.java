@@ -36,7 +36,7 @@ public class RegistryHelper {
     public final CreativeModeTab defaultTab;
     private final Map<IForgeRegistry<?>, DeferredRegister<?>> registries = Maps.newHashMap();
 
-    private final Queue<Pair<BlockEntry, BlockRenderType>> renderTypes = Queues.newLinkedBlockingDeque();
+    private final Queue<Pair<BlockEntry<?>, BlockRenderType>> renderTypes = Queues.newLinkedBlockingDeque();
 
     public RegistryHelper(String modid) {
         this(modid, CreativeModeTab.TAB_MISC);
@@ -66,46 +66,44 @@ public class RegistryHelper {
 
 
     //Blocks
-    public BlockEntry.Builder createBlock(String id, Supplier<? extends Block> constructor) {
-        return new BlockEntry.Builder(this, id, constructor);
+    public <T extends Block> BlockEntry.Builder<T> createBlock(String id, Supplier<T> constructor) {
+        return new BlockEntry.Builder<T>(this, id, constructor);
     }
 
-    public BlockEntry.Builder createBlock(String id, Function<Block.Properties, ? extends Block> constructor, Block.Properties properties) {
-        return new BlockEntry.Builder(this, id, constructor, properties);
+    public <T extends Block> BlockEntry.Builder<T> createBlock(String id, Function<Block.Properties, T> constructor, Block.Properties properties) {
+        return new BlockEntry.Builder<T>(this, id, constructor, properties);
     }
 
-    public BlockEntry.Builder createBlock(String id, Block.Properties properties) {
-        return new BlockEntry.Builder(this, id, properties);
+    public BlockEntry.Builder<Block> createBlock(String id, Block.Properties properties) {
+        return new BlockEntry.Builder<Block>(this, id, () -> new Block(properties));
     }
-
-
 
     //Items
-    public ItemEntry createItem(String id, Supplier<? extends Item> constructor) {
-        return new ItemEntry(this, id, constructor);
+    public <T extends Item> ItemEntry<T> createItem(String id, Supplier<T> constructor) {
+        return new ItemEntry<T>(this, id, constructor);
     }
 
-    public ItemEntry createItem(String id, Function<Item.Properties, Item> constructor, Item.Properties props) {
-        return new ItemEntry(this, id, () -> constructor.apply(props));
+    public <T extends Item> ItemEntry<T> createItem(String id, Function<Item.Properties, T> constructor, Item.Properties props) {
+        return new ItemEntry<T>(this, id, () -> constructor.apply(props));
     }
 
-    public ItemEntry createItem(String id, Item.Properties props) {
-        return new ItemEntry(this, id, () -> new Item(props));
+    public ItemEntry<Item> createItem(String id, Item.Properties props) {
+        return new ItemEntry<Item>(this, id, () -> new Item(props));
     }
 
-    public ItemEntry createItem(String id, CreativeModeTab tab) {
+    public ItemEntry<Item> createItem(String id, CreativeModeTab tab) {
         return createItem(id, new Item.Properties().tab(tab));
     }
 
-    public ItemEntry createItem(String id) {
+    public ItemEntry<Item> createItem(String id) {
         return createItem(id, defaultTab);
     }
 
-    public ItemEntry createFood(String id, FoodProperties props) {
+    public ItemEntry<Item> createFood(String id, FoodProperties props) {
         return createItem(id, new Item.Properties().food(props).tab(CreativeModeTab.TAB_FOOD));
     }
 
-    public <T extends Mob> ItemEntry createSpawnEgg(String entityId, Supplier<EntityType<T>> entityType, int primaryColor, int secondaryColor) {
+    public <T extends Mob> ItemEntry<ForgeSpawnEggItem> createSpawnEgg(String entityId, Supplier<EntityType<T>> entityType, int primaryColor, int secondaryColor) {
         return createItem(entityId + "_spawn_egg", () -> new ForgeSpawnEggItem(entityType, primaryColor, secondaryColor, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
     }
 
@@ -124,15 +122,15 @@ public class RegistryHelper {
 
 
     //Misc
-    public void setBlockRenderType(BlockEntry blockEntry, BlockRenderType renderType) {
+    public void setBlockRenderType(BlockEntry<?> blockEntry, BlockRenderType renderType) {
         renderTypes.add(Pair.of(blockEntry, renderType));
     }
 
     @OnlyIn(Dist.CLIENT)
     public void initRenderTypes() {
         while (!renderTypes.isEmpty()) {
-            Pair<BlockEntry, BlockRenderType> pair = renderTypes.poll();
-            ItemBlockRenderTypes.setRenderLayer(pair.getLeft().get(), pair.getRight().get());;
+            Pair<BlockEntry<?>, BlockRenderType> pair = renderTypes.poll();
+            ItemBlockRenderTypes.setRenderLayer(pair.getLeft().get(), pair.getRight().get());
         }
     }
 

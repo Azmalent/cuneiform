@@ -10,15 +10,15 @@ import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public final class ItemEntry implements Supplier<Item>, ItemLike {
-    private final RegistryObject<Item> item;
+public final class ItemEntry<T extends Item> implements Supplier<T>, ItemLike {
+    private final RegistryObject<T> item;
 
-    public ItemEntry(RegistryHelper registryHelper, String id, Supplier<? extends Item> constructor) {
+    public ItemEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor) {
         item = registryHelper.getOrCreateRegistry(ForgeRegistries.ITEMS).register(id, constructor);
     }
 
     @Override
-    public Item get() {
+    public T get() {
         return item.get();
     }
 

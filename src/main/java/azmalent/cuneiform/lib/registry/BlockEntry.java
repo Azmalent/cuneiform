@@ -15,20 +15,20 @@ import java.util.function.Supplier;
 import static net.minecraftforge.registries.ForgeRegistries.*;
 
 @SuppressWarnings("unused")
-public final class BlockEntry implements Supplier<Block>, ItemLike {
-    public final RegistryObject<Block> block;
+public final class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
+    public final RegistryObject<T> block;
 
-    private BlockEntry(RegistryHelper registryHelper, String id, Supplier<? extends Block> constructor) {
+    private BlockEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor) {
         block = registryHelper.getOrCreateRegistry(BLOCKS).register(id, constructor);
     }
 
-    private BlockEntry(RegistryHelper registryHelper,String id, Supplier<? extends Block> constructor, CreativeModeTab creativeTab) {
+    private BlockEntry(RegistryHelper registryHelper,String id, Supplier<T> constructor, CreativeModeTab creativeTab) {
         this(registryHelper, id, constructor, (block) ->
            new BlockItem(block, new Item.Properties().tab(creativeTab))
         );
     }
 
-    private BlockEntry(RegistryHelper registryHelper, String id, Supplier<? extends Block> constructor, Function<Block, ? extends BlockItem> itemConstructor) {
+    private BlockEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor, Function<Block, ? extends BlockItem> itemConstructor) {
         block = registryHelper.getOrCreateRegistry(BLOCKS).register(id, constructor);
         registryHelper.getOrCreateRegistry(ITEMS).register(id, () -> itemConstructor.apply(block.get()));
     }
@@ -50,7 +50,7 @@ public final class BlockEntry implements Supplier<Block>, ItemLike {
     }
 
     @Override
-    public Block get() {
+    public T get() {
         return block.get();
     }
 
@@ -65,28 +65,24 @@ public final class BlockEntry implements Supplier<Block>, ItemLike {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static class Builder {
+    public static class Builder<T extends Block> {
         protected RegistryHelper helper;
 
         protected String id;
-        protected Supplier<? extends Block> constructor;
+        protected Supplier<T> constructor;
         protected Function<Block, ? extends BlockItem> blockItemConstructor;
         protected boolean noItemForm = false;
 
         protected BlockRenderType renderType = BlockRenderType.SOLID;
 
-        public Builder(RegistryHelper helper, String id, Supplier<? extends Block> constructor) {
+        public Builder(RegistryHelper helper, String id, Supplier<T> constructor) {
             this.helper = helper;
             this.id = id;
             this.constructor = constructor;
         }
 
-        public Builder(RegistryHelper helper, String id, Function<Block.Properties, ? extends Block> constructor, Block.Properties properties) {
+        public Builder(RegistryHelper helper, String id, Function<Block.Properties, T> constructor, Block.Properties properties) {
             this(helper, id, () -> constructor.apply(properties));
-        }
-
-        public Builder(RegistryHelper helper, String id, Block.Properties properties) {
-            this(helper, id, () -> new Block(properties));
         }
 
         public BlockEntry build() {

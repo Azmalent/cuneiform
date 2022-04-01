@@ -1,5 +1,6 @@
 package azmalent.cuneiform.lib.util;
 
+import azmalent.cuneiform.common.crafting.ShapelessRecipeMatcher;
 import azmalent.cuneiform.mixin.accessor.RecipeManagerAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -21,7 +22,7 @@ public final class CraftingUtil {
         return ((RecipeManagerAccessor) world.getRecipeManager()).cuneiform_byType(type);
     }
 
-    public ItemStack findItemInGrid(CraftingContainer container, @Nonnull Predicate<ItemStack> predicate) {
+    public static ItemStack findItemInGrid(CraftingContainer container, @Nonnull Predicate<ItemStack> predicate) {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty() && predicate.test(stack)) {
@@ -32,59 +33,7 @@ public final class CraftingUtil {
         return ItemStack.EMPTY;
     }
 
-    @SafeVarargs
-    public final ShapelessMatcher createStackMatcher(@Nonnull Predicate<ItemStack>... predicates) {
-        return new ShapelessMatcher(predicates);
-    }
-
-    @SafeVarargs
-    @SuppressWarnings("unchecked")
-    public final ShapelessMatcher createItemMatcher(@Nonnull Predicate<Item>... predicates) {
-        Predicate<ItemStack>[] stackPredicates = new Predicate[predicates.length];
-        for (int i = 0; i < predicates.length; i++) {
-            Predicate<Item> predicate = predicates[i];
-            stackPredicates[i] = stack -> predicate.test(stack.getItem());
-        }
-
-        return new ShapelessMatcher(stackPredicates);
-    }
-
-    public static final class ShapelessMatcher {
-        private final Predicate<ItemStack>[] predicates;
-        private final boolean[] matches;
-
-        @SafeVarargs
-        private ShapelessMatcher(@Nonnull Predicate<ItemStack>... predicates) {
-            this.predicates = predicates;
-            this.matches = new boolean[predicates.length];
-            resetMatches();
-        }
-
-        private void resetMatches() {
-            Arrays.fill(matches, false);
-        }
-
-        public boolean matches(CraftingContainer container, @Nonnull Level level) {
-            resetMatches();
-
-            for (int i = 0; i < container.getContainerSize(); i++) {
-                ItemStack stack = container.getItem(i);
-                if (!stack.isEmpty()) {
-                    boolean matchesAnything = false;
-
-                    for (int j = 0; j < predicates.length; j++) {
-                        if (predicates[j].test(stack) && !matches[j]) {
-                            matches[j] = true;
-                            matchesAnything = true;
-                            break;
-                        }
-                    }
-
-                    if (!matchesAnything) return false;
-                }
-            }
-
-            return true;
-        }
+    public static ShapelessRecipeMatcher.Builder defineShapelessRecipe() {
+        return new ShapelessRecipeMatcher.Builder();
     }
 }
