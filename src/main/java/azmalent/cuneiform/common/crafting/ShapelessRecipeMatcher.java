@@ -3,6 +3,7 @@ package azmalent.cuneiform.common.crafting;
 import com.google.common.collect.Lists;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -68,7 +69,7 @@ public final class ShapelessRecipeMatcher {
             return this;
         }
 
-        public Builder addIngredient(Tag<Item> tag) {
+        public Builder addIngredient(TagKey<Item> tag) {
             predicates.add(stack -> stack.is(tag));
             return this;
         }
