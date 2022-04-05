@@ -18,6 +18,20 @@ public final class ItemUtil {
         throw new IllegalArgumentException(item.toString() + " is not a block item!");
     }
 
+    public static void damageHeldItem(Player player, InteractionHand hand) {
+        damageHeldItem(player, hand, 1);
+    }
+
+    public static void damageHeldItem(Player player, InteractionHand hand, int amount) {
+        if (!player.level.isClientSide) {
+            ItemStack stack = player.getItemInHand(hand);
+
+            stack.hurtAndBreak(amount, player, (p) -> {
+                p.broadcastBreakEvent(hand);
+            });
+        }
+    }
+
     public static void giveStackToPlayer(Player player, ItemStack stack) {
         if (!player.getInventory().add(stack)) {
             player.drop(stack, false);

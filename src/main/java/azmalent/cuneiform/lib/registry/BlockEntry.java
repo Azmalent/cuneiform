@@ -64,7 +64,6 @@ public final class BlockEntry<T extends Block> implements Supplier<T>, ItemLike 
         return block.get().asItem();
     }
 
-    @SuppressWarnings("ConstantConditions")
     public static class Builder<T extends Block> {
         protected RegistryHelper helper;
 
@@ -85,16 +84,16 @@ public final class BlockEntry<T extends Block> implements Supplier<T>, ItemLike 
             this(helper, id, () -> constructor.apply(properties));
         }
 
-        public BlockEntry build() {
-            BlockEntry entry;
+        public BlockEntry<T> build() {
+            BlockEntry<T> entry;
             if (noItemForm) {
-                entry = new BlockEntry(helper, id, constructor);
+                entry = new BlockEntry<T>(helper, id, constructor);
             }
             else if (blockItemConstructor != null) {
-                entry = new BlockEntry(helper, id, constructor, blockItemConstructor);
+                entry = new BlockEntry<T>(helper, id, constructor, blockItemConstructor);
             }
             else {
-                entry = new BlockEntry(helper, id, constructor, helper.defaultTab);
+                entry = new BlockEntry<T>(helper, id, constructor, helper.defaultTab);
             }
 
             if (renderType != BlockRenderType.SOLID) {
@@ -105,64 +104,64 @@ public final class BlockEntry<T extends Block> implements Supplier<T>, ItemLike 
         }
 
         //Item form
-        public Builder blockItem(Function<Block, ? extends BlockItem> blockItemConstructor) {
+        public Builder<T> blockItem(Function<Block, ? extends BlockItem> blockItemConstructor) {
             this.blockItemConstructor = blockItemConstructor;
             return this;
         }
 
-        public Builder blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, Item.Properties properties) {
+        public Builder<T> blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, Item.Properties properties) {
             this.blockItemConstructor = block -> blockItemConstructor.apply(block, properties);
             return this;
         }
 
-        public Builder blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, CreativeModeTab group) {
+        public Builder<T> blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, CreativeModeTab group) {
             return this.blockItem(blockItemConstructor, new Item.Properties().tab(group));
         }
 
-        public Builder tallBlockItem(Item.Properties properties) {
+        public Builder<T> tallBlockItem(Item.Properties properties) {
             return this.blockItem(DoubleHighBlockItem::new, properties);
         }
 
-        public Builder tallBlockItem(CreativeModeTab group) {
+        public Builder<T> tallBlockItem(CreativeModeTab group) {
             return this.blockItem(DoubleHighBlockItem::new, group);
         }
 
-        public Builder wallOrFloorItem(BlockEntry wallBlock, Item.Properties properties) {
+        public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock, Item.Properties properties) {
             return this.blockItem(block -> new StandingAndWallBlockItem(wallBlock.get(), block, properties));
         }
 
-        public Builder wallOrFloorItem(BlockEntry wallBlock, CreativeModeTab group) {
+        public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock, CreativeModeTab group) {
             return this.wallOrFloorItem(wallBlock, new Item.Properties().tab(group));
         }
 
-        public Builder blockItem(Item.Properties properties) {
+        public Builder<T> blockItem(Item.Properties properties) {
             return this.blockItem(BlockItem::new, properties);
         }
 
-        public Builder blockItem(CreativeModeTab group) {
+        public Builder<T> blockItem(CreativeModeTab group) {
             return this.blockItem(new Item.Properties().tab(group));
         }
 
-        public Builder noItemForm() {
+        public Builder<T> noItemForm() {
             this.noItemForm = true;
             return this;
         }
 
         //Render types
-        public Builder renderType(BlockRenderType type) {
+        public Builder<T> renderType(BlockRenderType type) {
             this.renderType = type;
             return this;
         }
 
-        public Builder cutoutRender() {
+        public Builder<T> cutoutRender() {
             return this.renderType(BlockRenderType.CUTOUT);
         }
 
-        public Builder cutoutMippedRender() {
+        public Builder<T> cutoutMippedRender() {
             return this.renderType(BlockRenderType.CUTOUT_MIPPED);
         }
 
-        public Builder transculentRender() {
+        public Builder<T> transculentRender() {
             return this.renderType(BlockRenderType.TRANSCULENT);
         }
     }
