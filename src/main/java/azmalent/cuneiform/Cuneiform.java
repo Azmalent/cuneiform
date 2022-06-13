@@ -1,8 +1,6 @@
 package azmalent.cuneiform;
 
 import azmalent.cuneiform.command.DimensionTeleportCommand;
-import azmalent.cuneiform.command.KillAllCommand;
-import azmalent.cuneiform.command.KillItemsCommand;
 import azmalent.cuneiform.common.crafting.StrippingByproductRecipe;
 import azmalent.cuneiform.common.data.FuelHandler;
 import azmalent.cuneiform.common.data.WanderingTraderHandler;
@@ -57,16 +55,6 @@ public final class Cuneiform {
         if (CuneiformConfig.Server.Commands.dimteleport.get()) {
             LOGGER.info("Registering /dimteleport");
             new DimensionTeleportCommand().register(dispatcher);
-        }
-
-        if (CuneiformConfig.Server.Commands.killall.get()) {
-            LOGGER.info("Registering /killall");
-            new KillAllCommand().register(dispatcher);
-        }
-
-        if (CuneiformConfig.Server.Commands.killitems.get()) {
-            LOGGER.info("Registering /killitems");
-            new KillItemsCommand().register(dispatcher);
         }
     }
 

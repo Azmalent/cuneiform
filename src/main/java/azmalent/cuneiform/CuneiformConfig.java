@@ -32,18 +32,22 @@ public final class CuneiformConfig {
                 "[net.minecraft.command.Commands]: Ambiguity between arguments"
             );
 
-            @Comment("Any lines matching the following regular expressions will be removed from the logs.")
+            @Comment({"Any lines matching the following regular expressions will be removed from the logs.",
+                "Note that the whole line doesn't have to match the regex, it just needs to contain a match in it.",
+                "If you want to match the whole string, use ^ and $ symbols (see regex syntax for more info)"})
             public static ParseableListOption<Pattern> patternsToRemove = ParseableListOption.ofRegexes(
                 "\\[net\\.minecraftforge\\.common\\.ForgeConfigSpec\\/CORE\\]: Configuration file .* is not correct. Correcting",
                 "\\[net\\.minecraftforge\\.common\\.ForgeConfigSpec\\/CORE\\]: Incorrect key .* was corrected from .* to .*"
             );
 
-            @Comment("Stack traces from the following exceptions will be truncated, leaving only the message.")
+            @Comment({"Stack traces from the following exceptions will be truncated, leaving only the message.",
+                "The class must be exactly the same, child classes will not be filtered!"})
             public static ParseableListOption<Class<?>> exceptionsToTruncate = ParseableListOption.ofClasses(
                 "com.google.gson.JsonSyntaxException"
             );
 
-            @Comment("The following exceptions will be completely removed from the logs.")
+            @Comment({"Exceptions inheriting the following classes will be completely removed from the logs.",
+                "The class must be exactly the same, child classes will not be filtered!"})
             public static ParseableListOption<Class<?>> exceptionsToIgnore = ParseableListOption.ofClasses();
         }
     }
@@ -57,14 +61,6 @@ public final class CuneiformConfig {
             @Name("/dimteleport")
             @Comment("Allows teleporting between dimensions.")
             public static BooleanOption dimteleport = BooleanOption.of(true);
-
-            @Name("/killitems")
-            @Comment("Deletes all dropped items.")
-            public static BooleanOption killitems = BooleanOption.of(true);
-
-            @Name("/killall")
-            @Comment("Kills all non-player entities.")
-            public static BooleanOption killall = BooleanOption.of(true);
         }
     }
 }

@@ -23,15 +23,11 @@ public class FilteringHandler {
     }
 
     public static boolean shouldIgnoreException(Throwable ex) {
-        return ex != null && Filtering.exceptionsToIgnore.anyMatch(clazz ->
-            ReflectionUtil.isSubclass(ex.getClass(), clazz)
-        );
+        return ex != null && Filtering.exceptionsToIgnore.contains(ex.getClass());
     }
 
     public static boolean shouldTruncateException(Throwable ex) {
-        return ex != null && Filtering.exceptionsToTruncate.anyMatch(clazz ->
-            ReflectionUtil.isSubclass(ex.getClass(), clazz)
-        );
+        return ex != null && Filtering.exceptionsToTruncate.contains(ex.getClass());
     }
 
     public static boolean isLoggable(String message) {
