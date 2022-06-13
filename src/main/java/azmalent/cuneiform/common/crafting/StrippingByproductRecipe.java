@@ -1,8 +1,8 @@
 package azmalent.cuneiform.common.crafting;
 
 import azmalent.cuneiform.Cuneiform;
-import azmalent.cuneiform.lib.registry.AbstractRecipe;
-import azmalent.cuneiform.lib.registry.ModRecipeType;
+import azmalent.cuneiform.registry.AbstractRecipe;
+import azmalent.cuneiform.registry.ModRecipeType;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;

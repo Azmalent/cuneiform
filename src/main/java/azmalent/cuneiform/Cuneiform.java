@@ -6,8 +6,9 @@ import azmalent.cuneiform.command.KillItemsCommand;
 import azmalent.cuneiform.common.crafting.StrippingByproductRecipe;
 import azmalent.cuneiform.common.data.FuelHandler;
 import azmalent.cuneiform.common.data.WanderingTraderHandler;
+import azmalent.cuneiform.common.data.conditions.ConfigFlagManager;
 import azmalent.cuneiform.filter.FilteringHandler;
-import azmalent.cuneiform.lib.network.CuneiformNetwork;
+import azmalent.cuneiform.network.CuneiformNetwork;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -21,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(Cuneiform.MODID)
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings({"unused"})
 public final class Cuneiform {
     public static final String MODID = "cuneiform";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
@@ -32,6 +33,7 @@ public final class Cuneiform {
             FilteringHandler.applyLogFilter();
         }
 
+        FMLJavaModLoadingContext.get().getModEventBus().register(ConfigFlagManager.class);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(RecipeSerializer.class, Cuneiform::registerRecipeTypes);
 
         MinecraftForge.EVENT_BUS.addListener(Cuneiform::registerCommands);

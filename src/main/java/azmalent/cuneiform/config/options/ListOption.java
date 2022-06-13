@@ -1,0 +1,38 @@
+package azmalent.cuneiform.config.options;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import net.minecraftforge.common.ForgeConfigSpec;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+@SuppressWarnings("unused")
+public final class ListOption<T> extends BasicConfigOption<List<? extends T>> {
+    private final Predicate<T> validator;
+
+    private ListOption(List<T> defaultValue, Predicate<T> validator) {
+        super(ImmutableList.copyOf(defaultValue));
+        this.validator = validator;
+    }
+
+    public static <T> ListOption<T> of(List<T> defaultValue, Predicate<T> validator) {
+        return new ListOption<T>(defaultValue, validator);
+    }
+
+    @SafeVarargs
+    public static <T> ListOption<T> of(T... defaultValues) {
+        return of(Lists.newArrayList(defaultValues), Objects::nonNull);
+    }
+
+    public static <T> ListOption<T> of(Predicate<T> validator) {
+        return of(Lists.newArrayList(), validator);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void init(ForgeConfigSpec.Builder builder, Field field) {
+        value = addComment(builder, field).defineList(getFieldName(field), defaultValue, (Predicate<Object>) validator);
+    }
+}

@@ -1,14 +1,15 @@
 package azmalent.cuneiform;
 
-import azmalent.cuneiform.lib.config.CommonConfigFile;
-import azmalent.cuneiform.lib.config.ServerConfigFile;
-import azmalent.cuneiform.lib.config.Category;
-import azmalent.cuneiform.lib.config.options.*;
-import azmalent.cuneiform.lib.config.annotations.Comment;
-import azmalent.cuneiform.lib.config.annotations.Name;
-import azmalent.cuneiform.lib.config.options.lazy.ClassListOption;
-import azmalent.cuneiform.lib.config.options.lazy.RegexListOption;
-import com.google.common.collect.Lists;
+import azmalent.cuneiform.config.Comment;
+import azmalent.cuneiform.config.ConfigFile;
+import azmalent.cuneiform.config.Name;
+import azmalent.cuneiform.config.options.*;
+import com.google.common.collect.Maps;
+import net.minecraft.Util;
+import net.minecraft.core.Direction;
+import net.minecraftforge.fml.config.ModConfig;
+
+import java.util.regex.Pattern;
 
 public final class CuneiformConfig {
     public static void init() {
@@ -16,51 +17,54 @@ public final class CuneiformConfig {
         new Server().register();
     }
 
-    public static class Common extends CommonConfigFile {
+    public static class Common extends ConfigFile {
         public Common() {
-            super(Cuneiform.MODID);
+            super(Cuneiform.MODID, ModConfig.Type.COMMON);
         }
 
         @Comment("Features related to log filtering.")
-        public static class Filtering extends Category {
-            public static BooleanOption enabled = new BooleanOption(true);
+        public static class Filtering {
+            public static BooleanOption enabled = BooleanOption.of(true);
 
-            @Comment("Any lines containing the following text will be removed from the logs.")
-            public static ListOption<String> stringsToRemove = new ListOption<>(Lists.newArrayList(
+            @Comment("Any lines containing the following substrings will be removed from the logs.")
+            public static ListOption<String> substringsToRemove = ListOption.of(
                 "[net.minecraft.util.Util]: No data fixer registered for",
                 "[net.minecraft.command.Commands]: Ambiguity between arguments"
-            ));
+            );
 
             @Comment("Any lines matching the following regular expressions will be removed from the logs.")
-            public static RegexListOption patternsToRemove = new RegexListOption(Lists.newArrayList(
+            public static ParseableListOption<Pattern> patternsToRemove = ParseableListOption.ofRegexes(
                 "\\[net\\.minecraftforge\\.common\\.ForgeConfigSpec\\/CORE\\]: Configuration file .* is not correct. Correcting",
                 "\\[net\\.minecraftforge\\.common\\.ForgeConfigSpec\\/CORE\\]: Incorrect key .* was corrected from .* to .*"
-            ));
+            );
 
             @Comment("Stack traces from the following exceptions will be truncated, leaving only the message.")
-            public static ClassListOption exceptionsToTruncate = new ClassListOption(Lists.newArrayList(
+            public static ParseableListOption<Class<?>> exceptionsToTruncate = ParseableListOption.ofClasses(
                 "com.google.gson.JsonSyntaxException"
-            ));
+            );
+
+            @Comment("The following exceptions will be completely removed from the logs.")
+            public static ParseableListOption<Class<?>> exceptionsToIgnore = ParseableListOption.ofClasses();
         }
     }
 
-    public static class Server extends ServerConfigFile {
+    public static class Server extends ConfigFile {
         public Server() {
-            super(Cuneiform.MODID);
+            super(Cuneiform.MODID, ModConfig.Type.SERVER);
         }
 
-        public static class Commands extends Category {
+        public static class Commands {
             @Name("/dimteleport")
             @Comment("Allows teleporting between dimensions.")
-            public static BooleanOption dimteleport = new BooleanOption(true);
+            public static BooleanOption dimteleport = BooleanOption.of(true);
 
             @Name("/killitems")
             @Comment("Deletes all dropped items.")
-            public static BooleanOption killitems = new BooleanOption(true);
+            public static BooleanOption killitems = BooleanOption.of(true);
 
             @Name("/killall")
             @Comment("Kills all non-player entities.")
-            public static BooleanOption killall = new BooleanOption(true);
+            public static BooleanOption killall = BooleanOption.of(true);
         }
     }
 }

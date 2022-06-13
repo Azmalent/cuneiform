@@ -15,11 +15,18 @@ class LogFilter extends AbstractFilter implements Filter {
         boolean isLoggable = FilteringHandler.isLoggable(line);
         if (isLoggable) {
             Throwable exception = event.getThrown();
-            FilteringHandler.truncateException(exception);
+            if (FilteringHandler.shouldIgnoreException(exception)) {
+                return Result.DENY;
+            }
+
+            if (FilteringHandler.shouldTruncateException(exception)) {
+                exception.setStackTrace(new StackTraceElement[]{});
+            }
+
+            return Result.NEUTRAL;
         }
 
-        return isLoggable ? Result.NEUTRAL : Result.DENY;
-
+        return Result.DENY;
     }
 
     //Java loggers
@@ -30,8 +37,15 @@ class LogFilter extends AbstractFilter implements Filter {
         boolean isLoggable = FilteringHandler.isLoggable(line);
         if (isLoggable) {
             Throwable exception = record.getThrown();
-            FilteringHandler.truncateException(exception);
+            if (FilteringHandler.shouldIgnoreException(exception)) {
+                return false;
+            }
+
+            if (FilteringHandler.shouldTruncateException(exception)) {
+                exception.setStackTrace(new StackTraceElement[]{});
+            }
         }
+
         return isLoggable;
     }
 }

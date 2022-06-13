@@ -16,12 +16,12 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-ext.configFile = file('gradle.properties')
+ext.configFile = file('build.properties')
 ext.config = parseConfig(configFile)
 
-version = "${minecraft_version}-${mod_version}"
-group = "azmalent.${modid}"
-archivesBaseName = modid
+version = "${config.minecraft_version}-${config.mod_version}"
+group = "azmalent.${config.modid}"
+archivesBaseName = config.modid
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 compileJava.options.compilerArgs << "-Xlint:all,-deprecation"
@@ -29,7 +29,7 @@ compileJava.options.compilerArgs << "-Xlint:all,-deprecation"
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-    mappings channel: mappings_channel, version: mappings_version
+    mappings channel: config.mappings_channel, version: config.mappings_version
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -76,11 +76,11 @@ minecraft {
 }
 
 mixin {
-    add sourceSets.main, "${modid}.mixins.refmap.json"
+    add sourceSets.main, "${config.modid}.mixins.refmap.json"
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    minecraft "net.minecraftforge:forge:${config.minecraft_version}-${config.forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
@@ -88,9 +88,9 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
 
-        expand 'mod_name': mod_name, 'mod_version': project.version,
-                'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
-                'fml_min': fml_min, 'forge_version': forge_version
+        expand 'mod_name': config.mod_name, 'mod_version': config.mod_version,
+                'minecraft_version': config.minecraft_version, 'minecraft_version_range': config.minecraft_version_range,
+                'fml_min': config.fml_min, 'forge_version': config.forge_version
     }
 
     from(sourceSets.main.resources.srcDirs) {
@@ -103,16 +103,16 @@ processResources {
 jar {
     manifest {
         attributes([
-                "Specification-Title": "${modid}",
+                "Specification-Title": "${config.modid}",
                 "Specification-Vendor": "azmalent",
                 "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": "${modid}",
-                "Implementation-Version": "${mod_version}",
+                "Implementation-Title": "${config.modid}",
+                "Implementation-Version": "${config.mod_version}",
                 "Implementation-Vendor": "azmalent",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
 
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                "MixinConfigs": "${modid}.mixins.json",
+                "MixinConfigs": "${config.modid}.mixins.json",
                 'FMLCorePluginContainsFMLMod': 'true',
                 'ForceLoadAsMod': 'true'
         ])

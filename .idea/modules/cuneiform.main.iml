@@ -12,8 +12,8 @@
   </component>
   <component name="McpModuleSettings">
     <option name="mappingFile" value="C:\Users\Дмитрий\source\repos\Minecraft\cuneiform\build\createMcpToSrg\output.tsrg" />
-    <option name="mcpVersion" value="parchment_2021.12.19-1.18.1" />
-    <option name="minecraftVersion" value="1.18.1" />
+    <option name="mcpVersion" value="parchment_2022.03.13-1.18.2" />
+    <option name="minecraftVersion" value="1.18.2" />
     <option name="srgType" value="TSRG" />
   </component>
 </module>

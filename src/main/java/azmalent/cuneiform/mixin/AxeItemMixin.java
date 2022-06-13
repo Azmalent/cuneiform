@@ -1,7 +1,7 @@
 package azmalent.cuneiform.mixin;
 
 import azmalent.cuneiform.common.crafting.StrippingByproductRecipe;
-import azmalent.cuneiform.lib.util.CraftingUtil;
+import azmalent.cuneiform.util.CraftingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.AxeItem;

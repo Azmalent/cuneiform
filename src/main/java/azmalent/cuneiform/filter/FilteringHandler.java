@@ -1,6 +1,7 @@
 package azmalent.cuneiform.filter;
 
-import azmalent.cuneiform.CuneiformConfig;
+import azmalent.cuneiform.CuneiformConfig.Common.Filtering;
+import azmalent.cuneiform.util.ReflectionUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
@@ -21,31 +22,27 @@ public class FilteringHandler {
         }
     }
 
-    public static boolean shouldTruncateException(Throwable exception) {
-        if (exception == null) return false;
-
-        for (Class<?> clazz : CuneiformConfig.Common.Filtering.exceptionsToTruncate.get()) {
-            if (clazz.isAssignableFrom(exception.getClass())) return true;
-        }
-
-        return false;
+    public static boolean shouldIgnoreException(Throwable ex) {
+        return ex != null && Filtering.exceptionsToIgnore.anyMatch(clazz ->
+            ReflectionUtil.isSubclass(ex.getClass(), clazz)
+        );
     }
 
-    public static void truncateException(Throwable exception) {
-        if (shouldTruncateException(exception)) {
-            exception.setStackTrace(new StackTraceElement[]{});
-        }
+    public static boolean shouldTruncateException(Throwable ex) {
+        return ex != null && Filtering.exceptionsToTruncate.anyMatch(clazz ->
+            ReflectionUtil.isSubclass(ex.getClass(), clazz)
+        );
     }
 
     public static boolean isLoggable(String message) {
         try {
-            for (String stringToFilter : CuneiformConfig.Common.Filtering.stringsToRemove.get()) {
+            for (String stringToFilter : Filtering.substringsToRemove.get()) {
                 if (message.contains(stringToFilter)) {
                     return false;
                 }
             }
 
-            for (Pattern pattern : CuneiformConfig.Common.Filtering.patternsToRemove.get()) {
+            for (Pattern pattern : Filtering.patternsToRemove.get()) {
                 if (pattern.matcher(message).find()) {
                     return false;
                 }
