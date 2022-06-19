@@ -1,7 +1,6 @@
 package azmalent.cuneiform.filter;
 
-import azmalent.cuneiform.CuneiformConfig.Common.Filtering;
-import azmalent.cuneiform.util.ReflectionUtil;
+import azmalent.cuneiform.CuneiformConfig.Filtering;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
@@ -10,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class FilteringHandler {
     public static void applyLogFilter() {
-        LogFilter filter = new LogFilter();
+        var filter = new CuneiformLogFilter();
 
         java.util.logging.Logger.getLogger("").setFilter(filter);
 
@@ -22,15 +21,26 @@ public class FilteringHandler {
         }
     }
 
-    public static boolean shouldIgnoreException(Throwable ex) {
-        return ex != null && Filtering.exceptionsToIgnore.contains(ex.getClass());
+    public static boolean checkLogMessage(String loggerName, String message, Throwable exception) {
+        if (exception != null) {
+            if (Filtering.exceptionsToIgnore.get().contains(exception.getClass())) {
+                return false;
+            }
+
+            if (Filtering.exceptionsToTruncate.get().contains(exception.getClass())) {
+                exception.setStackTrace(new StackTraceElement[]{});
+            }
+
+            return true;
+        }
+
+        boolean whitelisted = Filtering.loggerWhitelist.get().contains(loggerName);
+        boolean blacklisted = Filtering.loggerBlacklist.get().contains(loggerName);
+
+        return whitelisted || !blacklisted && isLoggable("[" + loggerName + "]: " + message);
     }
 
-    public static boolean shouldTruncateException(Throwable ex) {
-        return ex != null && Filtering.exceptionsToTruncate.contains(ex.getClass());
-    }
-
-    public static boolean isLoggable(String message) {
+    private static boolean isLoggable(String message) {
         try {
             for (String stringToFilter : Filtering.substringsToRemove.get()) {
                 if (message.contains(stringToFilter)) {

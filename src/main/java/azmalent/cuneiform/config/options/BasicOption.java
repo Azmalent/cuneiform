@@ -5,11 +5,11 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.lang.reflect.Field;
 
 @SuppressWarnings("unused")
-public abstract class BasicConfigOption<T> extends AbstractConfigOption<T, T> {
+public abstract class BasicOption<T> extends AbstractConfigOption<T, T> {
     protected final T defaultValue;
     protected ForgeConfigSpec.ConfigValue<T> value;
 
-    protected BasicConfigOption(T defaultValue) {
+    protected BasicOption(T defaultValue) {
         this.defaultValue = defaultValue;
     }
 

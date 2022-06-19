@@ -1,11 +1,13 @@
 package azmalent.cuneiform.registry;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplie
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -34,9 +37,10 @@ import java.util.function.Supplier;
 public class RegistryHelper {
     public final String modid;
     public final CreativeModeTab defaultTab;
-    private final Map<IForgeRegistry<?>, DeferredRegister<?>> registries = Maps.newHashMap();
+    private final Map<ResourceKey<?>, DeferredRegister<?>> registries = Maps.newHashMap();
 
-    private final Queue<Pair<BlockEntry<?>, BlockRenderType>> renderTypes = Queues.newLinkedBlockingDeque();
+    private Queue<Pair<BlockEntry<?>, BlockRenderType>> renderTypes = Lists.newLinkedList();
+    private Queue<Pair<EntityEntry<? extends LivingEntity>, Supplier<AttributeSupplier>>> attributeSuppliers = Lists.newLinkedList();
 
     public RegistryHelper(String modid) {
         this(modid, CreativeModeTab.TAB_MISC);
@@ -46,8 +50,10 @@ public class RegistryHelper {
         this.modid = modid;
         this.defaultTab = defaultTab;
 
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        bus.addListener(this::onAttributeCreation);
+
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
             bus.addListener((FMLClientSetupEvent event) -> {
                 event.enqueueWork(this::initRenderTypes);
             });
@@ -55,15 +61,17 @@ public class RegistryHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IForgeRegistryEntry<T>> DeferredRegister<T> getOrCreateRegistry(IForgeRegistry<T> registry) {
-        if (!registries.containsKey(registry)) {
-            registries.put(registry, DeferredRegister.create(registry, modid));
+    public <T extends IForgeRegistryEntry<T>> DeferredRegister<T> getOrCreateRegistry(ResourceKey<? extends Registry<T>> registryKey) {
+        if (!registries.containsKey(registryKey)) {
+            registries.put(registryKey, DeferredRegister.create(registryKey, modid));
         }
 
-        return (DeferredRegister<T>) registries.get(registry);
+        return (DeferredRegister<T>) registries.get(registryKey);
     }
 
-
+    public <T extends IForgeRegistryEntry<T>> DeferredRegister<T> getOrCreateRegistry(IForgeRegistry<T> registry) {
+        return getOrCreateRegistry(registry.getRegistryKey());
+    }
 
     //Blocks
     public <T extends Block> BlockEntry.Builder<T> createBlock(String id, Supplier<T> constructor) {
@@ -107,8 +115,6 @@ public class RegistryHelper {
         return createItem(entityId + "_spawn_egg", () -> new ForgeSpawnEggItem(entityType, primaryColor, secondaryColor, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
     }
 
-
-
     //Block Entities
     @SafeVarargs
     public final <T extends BlockEntity> BlockEntityEntry<T> createBlockEntity(String id, BlockEntitySupplier<T> constructor, Supplier<? extends Block>... blockSuppliers) {
@@ -119,19 +125,49 @@ public class RegistryHelper {
         return new BlockEntityEntry<T>(this, id, constructor, blockSuppliers);
     }
 
+    //Entities
+    public final <T extends Entity> EntityEntry<T> createEntity(String id, EntityType.Builder<T> builder) {
+        return new EntityEntry<T>(this, id, builder);
+    }
 
+    public final <T extends Mob> MobEntry.Builder<T> createMob(String id, EntityType.Builder<T> builder) {
+        return new MobEntry.Builder<T>(this, id, builder);
+    }
 
-    //Misc
-    public void setBlockRenderType(BlockEntry<?> blockEntry, BlockRenderType renderType) {
+    public final <T extends Mob> void setEntityAttributes(EntityEntry<? extends LivingEntity> entity, Supplier<AttributeSupplier> supplier) {
+        if (attributeSuppliers == null) {
+            throw new IllegalStateException("Entity attribures already initialized");
+        }
+
+        attributeSuppliers.add(Pair.of(entity, supplier));
+    }
+
+    public final void onAttributeCreation(EntityAttributeCreationEvent event) {
+        while(!attributeSuppliers.isEmpty()) {
+            var pair = attributeSuppliers.poll();
+            event.put(pair.getLeft().get(), pair.getRight().get());
+        }
+
+        attributeSuppliers = null;
+    }
+
+    //Render types
+    public final void setBlockRenderType(BlockEntry<?> blockEntry, BlockRenderType renderType) {
+        if (renderTypes == null) {
+            throw new IllegalStateException("Render types already initialized");
+        }
+
         renderTypes.add(Pair.of(blockEntry, renderType));
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void initRenderTypes() {
-        while (!renderTypes.isEmpty()) {
-            Pair<BlockEntry<?>, BlockRenderType> pair = renderTypes.poll();
+    public final void initRenderTypes() {
+        while(!renderTypes.isEmpty()) {
+            var pair = renderTypes.poll();
             ItemBlockRenderTypes.setRenderLayer(pair.getLeft().get(), pair.getRight().get());
         }
+
+        renderTypes = null;
     }
 
     public enum BlockRenderType {

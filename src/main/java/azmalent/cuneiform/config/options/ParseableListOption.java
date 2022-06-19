@@ -11,6 +11,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -52,12 +53,9 @@ public final class ParseableListOption<T> extends AbstractConfigOption<List<T>, 
         });
     }
 
-    public boolean contains(T value) {
-        return get().contains(value);
-    }
-
-    public boolean anyMatch(Predicate<T> predicate) {
-        return get().stream().anyMatch(predicate);
+    @SuppressWarnings("unchecked")
+    public List<String> getStringValues() {
+        return (List<String>) stringValues.get();
     }
 
     @Override
@@ -75,6 +73,12 @@ public final class ParseableListOption<T> extends AbstractConfigOption<List<T>, 
         invalidate();
     }
 
+    public void update(Consumer<List<String>> consumer) {
+        var values = getStringValues();
+        consumer.accept(values);
+        set(values);
+    }
+
     @Override
     public void init(ForgeConfigSpec.Builder builder, Field field) {
         stringValues = addComment(builder, field).defineList(getFieldName(field), defaultValue, Objects::nonNull);
@@ -89,6 +93,6 @@ public final class ParseableListOption<T> extends AbstractConfigOption<List<T>, 
     @Override
     public void initValue() {
         initialized = true;
-        value = stringValues.get().stream().map(parser).filter(Objects::nonNull).collect(Collectors.toList());
+        value = stringValues.get().stream().map(parser).toList().stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

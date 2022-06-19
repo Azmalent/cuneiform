@@ -14,6 +14,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
@@ -25,9 +26,17 @@ public final class Cuneiform {
     public static final String MODID = "cuneiform";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
+    /*
+        TODO:
+        - List & map support for auto package serializer
+        - Config options for arbitrary objects/records
+     */
     public Cuneiform() {
-        CuneiformConfig.init();
-        if (CuneiformConfig.Common.Filtering.enabled.get()) {
+        CuneiformConfig.INSTANCE.buildSpec();
+        CuneiformConfig.INSTANCE.register();
+        CuneiformConfig.INSTANCE.sync(); //To enable filtering early
+
+        if (CuneiformConfig.Filtering.enabled.get()) {
             FilteringHandler.applyLogFilter();
         }
 
@@ -52,7 +61,7 @@ public final class Cuneiform {
         LOGGER.info("Registering commands");
         var dispatcher = event.getDispatcher();
 
-        if (CuneiformConfig.Server.Commands.dimteleport.get()) {
+        if (CuneiformConfig.Commands.dimteleport.get()) {
             LOGGER.info("Registering /dimteleport");
             new DimensionTeleportCommand().register(dispatcher);
         }

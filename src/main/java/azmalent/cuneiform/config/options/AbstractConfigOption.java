@@ -2,7 +2,7 @@ package azmalent.cuneiform.config.options;
 
 import azmalent.cuneiform.config.Comment;
 import azmalent.cuneiform.config.Name;
-import azmalent.cuneiform.util.TextUtil;
+import azmalent.cuneiform.util.StringUtil;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -35,6 +35,6 @@ public abstract class AbstractConfigOption<TGet, TSet> implements Supplier<TGet>
     protected final String getFieldName(Field field) {
         Name name = field.getAnnotation(Name.class);
         if (name != null) return name.value();
-        return TextUtil.splitCamelCase(field.getName());
+        return StringUtil.splitCamelCase(field.getName());
     }
 }

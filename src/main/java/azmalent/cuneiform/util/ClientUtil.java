@@ -3,6 +3,7 @@ package azmalent.cuneiform.util;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
@@ -13,30 +14,24 @@ import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
+@OnlyIn(Dist.CLIENT)
 @SuppressWarnings("unused")
-public final class TextUtil {
-    public static String splitCamelCase(String string) {
-        String[] words = StringUtils.splitByCharacterTypeCamelCase(string);
-        if (words.length > 0) {
-            words[0] = StringUtils.capitalize(words[0]);
-        }
-
-        return StringUtils.join(words, ' ');
+public final class ClientUtil {
+    public static Level getClientLevel() {
+        return Minecraft.getInstance().level;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip) {
         addEffectsTooltip(effects, tooltip, 1);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip, float durationMultiplier) {
         if (effects.isEmpty()) {
             MutableComponent noEffect = (new TranslatableComponent("effect.none")).withStyle(ChatFormatting.GRAY);
@@ -85,12 +80,12 @@ public final class TextUtil {
                 if (amount < 0.0D) d1 *= -1.0D;
 
                 tooltip.add((
-                    new TranslatableComponent(
-                        String.format("attribute.modifier.%s.%d", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
-                        ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        new TranslatableComponent(pair.getFirst().getDescriptionId())
-                    )
-                ).withStyle(amount > 0 ? ChatFormatting.BLUE : ChatFormatting.RED));
+                        new TranslatableComponent(
+                            String.format("attribute.modifier.%s.%d", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
+                            ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                            new TranslatableComponent(pair.getFirst().getDescriptionId())
+                        )
+                    ).withStyle(amount > 0 ? ChatFormatting.BLUE : ChatFormatting.RED));
             }
         }
     }

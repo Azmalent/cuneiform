@@ -1,21 +1,33 @@
 package azmalent.cuneiform.config;
 
+import azmalent.cuneiform.Cuneiform;
+import azmalent.cuneiform.CuneiformConfig;
 import azmalent.cuneiform.common.data.conditions.ConfigFlagManager;
-import azmalent.cuneiform.config.options.BooleanOption;
 import azmalent.cuneiform.config.options.AbstractConfigOption;
+import azmalent.cuneiform.config.options.BooleanOption;
+import azmalent.cuneiform.config.options.IParseableOption;
 import azmalent.cuneiform.util.ReflectionUtil;
-import azmalent.cuneiform.util.TextUtil;
+import azmalent.cuneiform.util.StringUtil;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+import org.apache.commons.compress.utils.Lists;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.util.List;
 
+@SuppressWarnings("unused")
 public abstract class ConfigFile {
+    private final List<IParseableOption> parseableCache = Lists.newArrayList();
+
     protected final String modid;
     protected final ModConfig.Type configType;
     protected ForgeConfigSpec spec;
@@ -29,7 +41,7 @@ public abstract class ConfigFile {
         return "%s-%s.toml".formatted(modid, configType.toString().toLowerCase());
     }
 
-    protected static void initOptions(Class<?> clazz, ForgeConfigSpec.Builder builder) {
+    protected final void initOptions(Class<?> clazz, ForgeConfigSpec.Builder builder) {
         var instance = ReflectionUtil.getSingletonInstanceOrNull(clazz);
 
         for (Field field : clazz.getFields()) {
@@ -37,6 +49,18 @@ public abstract class ConfigFile {
                 if (ReflectionUtil.isSubclass(field.getType(), AbstractConfigOption.class)) {
                     var option = (AbstractConfigOption<?, ?>) field.get(instance);
                     option.init(builder, field);
+
+                    if (option instanceof BooleanOption b && b.hasFlag()) {
+                        if (configType == ModConfig.Type.COMMON) {
+                            ConfigFlagManager.putFlag(modid, b.getConfigFlag(), b);
+                        } else {
+                            Cuneiform.LOGGER.warn(("Found flag '%s' in %s. " +
+                                "Ignoring as flags are only usable in common config files")
+                                .formatted(b.getConfigFlag(), getConfigFilename()));
+                        }
+                    } else if (option instanceof IParseableOption p) {
+                        parseableCache.add(p);
+                    }
                 }
             } catch (IllegalAccessException | IllegalArgumentException e) {
                 e.printStackTrace();
@@ -44,9 +68,9 @@ public abstract class ConfigFile {
         }
     }
 
-    protected static void initCategory(Class<?> clazz, ForgeConfigSpec.Builder builder) {
+    protected final void initCategory(Class<?> clazz, ForgeConfigSpec.Builder builder) {
         Name name = clazz.getAnnotation(Name.class);
-        String categoryName = (name != null) ? name.value() : TextUtil.splitCamelCase(clazz.getSimpleName());
+        String categoryName = (name != null) ? name.value() : StringUtil.splitCamelCase(clazz.getSimpleName());
 
         Comment comment = clazz.getAnnotation(Comment.class);
         if (comment != null) {
@@ -63,32 +87,10 @@ public abstract class ConfigFile {
         builder.pop();
     }
 
-    protected static void initConfigFlags(Class<?> clazz, String modid) {
-        var instance = ReflectionUtil.getSingletonInstanceOrNull(clazz);
-
-        for (Field field : clazz.getFields()) {
-            try {
-                if (ReflectionUtil.isSubclass(field.getType(), BooleanOption.class)) {
-                    BooleanOption option = (BooleanOption) field.get(instance);
-                    if (option.hasFlag()) {
-                        ConfigFlagManager.putFlag(modid, option.getConfigFlag(), option.get());
-                    }
-                }
-            } catch (IllegalAccessException | IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-        }
-
-        for (Class<?> innerClass : clazz.getDeclaredClasses()) {
-            initConfigFlags(innerClass, modid);
-        }
-    }
-
     public final void buildSpec() {
-        var clazz = this.getClass();
-
         var builder = new ForgeConfigSpec.Builder();
 
+        var clazz = this.getClass();
         initOptions(clazz, builder);
         for (Class<?> innerClass : clazz.getDeclaredClasses()) {
             initCategory(innerClass, builder);
@@ -97,17 +99,37 @@ public abstract class ConfigFile {
         spec = builder.build();
     }
 
-    public void register() {
-        buildSpec();
+    public final void register() {
         ModLoadingContext.get().registerConfig(configType, spec, getConfigFilename());
 
-        if (configType != ModConfig.Type.CLIENT) {
-            initConfigFlags(this.getClass(), modid);
-        }
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfigEvent.Loading event) -> {
+            if (event.getConfig().getSpec() == this.spec) {
+                this.onLoad();
+            }
+        });
+
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfigEvent.Reloading event) -> {
+            if (event.getConfig().getSpec() == this.spec) {
+                this.onFileChange();
+            }
+        });
     }
 
-    @SuppressWarnings("unused")
+    protected void onLoad() {
+        Cuneiform.LOGGER.info("Loading config file " + getConfigFilename());
+    }
+
+    protected void onFileChange() {
+        Cuneiform.LOGGER.info("Reloading config file " + getConfigFilename());
+        parseableCache.forEach(IParseableOption::invalidate);
+    }
+
     public void sync() {
+        if (configType == ModConfig.Type.SERVER) {
+            Cuneiform.LOGGER.warn("sync() called on a server config");
+            return;
+        }
+
         String filename = getConfigFilename();
         Path configPath = FMLPaths.CONFIGDIR.get().resolve(filename);
 

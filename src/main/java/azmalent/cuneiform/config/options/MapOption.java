@@ -1,5 +1,6 @@
 package azmalent.cuneiform.config.options;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.google.common.collect.Maps;
@@ -9,18 +10,26 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
-public final class MapOption<TValue> extends BasicConfigOption<Config> {
+public final class MapOption<TValue> extends BasicOption<Config> {
     @SuppressWarnings("unchecked")
     private MapOption(Map<String, TValue> defaultValue) {
-        super(Config.wrap((Map<String, Object>) defaultValue, TomlFormat.instance()));
+        super(CommentedConfig.wrap((Map<String, Object>) defaultValue, TomlFormat.instance()));
     }
 
     public static <TValue> MapOption<TValue> of(Map<String, TValue> defaultValue) {
         return new MapOption<TValue>(defaultValue);
     }
 
+    public static <TValue> MapOption<TValue> of(Map<String, TValue> map, Consumer<Map<String, TValue>> initializer) {
+        return of(Util.make(map, initializer));
+    }
+
     public static <TValue> MapOption<TValue> of(Consumer<Map<String, TValue>> initializer) {
-        return of(Util.make(Maps.newHashMap(), initializer));
+        return of(Util.make(Maps.newTreeMap(), initializer));
+    }
+
+    public static <TValue> MapOption<TValue> empty() {
+        return of(Maps.newTreeMap());
     }
 
     @SuppressWarnings("unchecked")

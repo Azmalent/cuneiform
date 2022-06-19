@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public final class BlockEntityEntry<T extends BlockEntity> implements Supplier<BlockEntityType<T>> {
+public class BlockEntityEntry<T extends BlockEntity> implements Supplier<BlockEntityType<T>> {
     public final RegistryObject<BlockEntityType<T>> type;
 
     @SafeVarargs

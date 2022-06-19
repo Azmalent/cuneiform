@@ -34,11 +34,11 @@ public final class ReflectionUtil {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getSingletonInstanceOrNull(@Nonnull Class<T> clazz) {
         Field instanceField = getFieldOrNull(clazz, "INSTANCE");
         if (instanceField != null && instanceField.getType().equals(clazz)) {
             try {
-                //noinspection unchecked
                 return (T) instanceField.get(null);
             } catch (IllegalAccessException e) {
                 return null;

@@ -13,6 +13,7 @@ public record RecipeConfigCondition(String modid, String flag, ResourceLocation 
     }
 
     @Override
+    @SuppressWarnings("removal")
     public boolean test() {
         return ConfigFlagManager.getFlag(modid, flag);
     }

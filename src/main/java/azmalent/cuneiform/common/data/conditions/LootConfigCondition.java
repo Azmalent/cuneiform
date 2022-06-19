@@ -1,16 +1,15 @@
 
 package azmalent.cuneiform.common.data.conditions;
 
-import com.electronwill.nightconfig.core.utils.StringUtils;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 public record LootConfigCondition(String modid, String flag) implements LootItemCondition {
     public static LootItemConditionType TYPE = new LootItemConditionType(new LootConfigCondition.Serializer());
@@ -35,8 +34,8 @@ public record LootConfigCondition(String modid, String flag) implements LootItem
         @Nonnull
         @Override
         public LootConfigCondition deserialize(@Nonnull JsonObject json, @Nonnull JsonDeserializationContext context) {
-            List<String> tokens = StringUtils.split(json.getAsJsonPrimitive("config").getAsString(), ':');
-            return new LootConfigCondition(tokens.get(0), tokens.get(1));
+            String[] tokens = StringUtils.split(json.getAsJsonPrimitive("config").getAsString(), ":", 2);
+            return new LootConfigCondition(tokens[0], tokens[1]);
         }
     }
 }

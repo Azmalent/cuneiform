@@ -4,7 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 
-public abstract class NumericOption<T extends Number> extends BasicConfigOption<T> {
+public abstract class NumericOption<T extends Number> extends BasicOption<T> {
     protected T min;
     protected T max;
 

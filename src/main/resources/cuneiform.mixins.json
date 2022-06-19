@@ -1,7 +1,7 @@
 {
   "minVersion": "0.8",
   "required": true,
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "refmap": "cuneiform.mixins.refmap.json",
   "package": "azmalent.cuneiform.mixin",
   "mixins": [

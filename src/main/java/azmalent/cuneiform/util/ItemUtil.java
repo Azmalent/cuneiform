@@ -1,6 +1,7 @@
 package azmalent.cuneiform.util;
 
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -15,7 +16,7 @@ public final class ItemUtil {
             return blockItem.getBlock();
         }
 
-        throw new IllegalArgumentException(item.toString() + " is not a block item!");
+        throw new IllegalArgumentException(item + " is not a block item!");
     }
 
     public static void damageHeldItem(Player player, InteractionHand hand) {
@@ -28,6 +29,20 @@ public final class ItemUtil {
 
             stack.hurtAndBreak(amount, player, (p) -> {
                 p.broadcastBreakEvent(hand);
+            });
+        }
+    }
+
+    public static void damageEquippedItem(Player player, EquipmentSlot slot) {
+        damageEquippedItem(player, slot, 1);
+    }
+
+    public static void damageEquippedItem(Player player, EquipmentSlot slot, int amount) {
+        if (!player.level.isClientSide) {
+            ItemStack stack = player.getItemBySlot(slot);
+
+            stack.hurtAndBreak(amount, player, (p) -> {
+                p.broadcastBreakEvent(slot);
             });
         }
     }

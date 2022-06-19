@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 import static net.minecraftforge.registries.ForgeRegistries.*;
 
 @SuppressWarnings("unused")
-public final class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
+public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
     public final RegistryObject<T> block;
 
     private BlockEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor) {

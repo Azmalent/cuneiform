@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public final class ItemEntry<T extends Item> implements Supplier<T>, ItemLike {
+public class ItemEntry<T extends Item> implements Supplier<T>, ItemLike {
     private final RegistryObject<T> item;
 
     public ItemEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor) {

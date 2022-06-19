@@ -35,7 +35,6 @@ public final class SerializationHandler {
         serializers.put(clazz, new NetworkSerializer<T>(reader, writer));
     }
 
-    //TODO: list & map support
     static {
         SerializationHandler.<Byte>registerSerializer(byte.class, FriendlyByteBuf::readByte, FriendlyByteBuf::writeByte);
         SerializationHandler.<Short>registerSerializer(short.class, FriendlyByteBuf::readShort, FriendlyByteBuf::writeShort);

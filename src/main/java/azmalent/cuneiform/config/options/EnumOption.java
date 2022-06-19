@@ -5,7 +5,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.lang.reflect.Field;
 
 @SuppressWarnings("unused")
-public final class EnumOption<E extends Enum<E>> extends BasicConfigOption<E> {
+public final class EnumOption<E extends Enum<E>> extends BasicOption<E> {
     private final E[] allowedValues;
 
     private EnumOption(E defaultValue, E[] allowedValues) {
