@@ -56,6 +56,12 @@ public final class ShapelessRecipeMatcher {
             }
         }
 
+        for (boolean match : matches) {
+            if (!match) {
+                return false;
+            }
+        }
+
         return true;
     }
 
