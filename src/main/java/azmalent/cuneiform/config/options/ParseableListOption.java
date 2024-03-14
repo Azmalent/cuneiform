@@ -46,6 +46,7 @@ public final class ParseableListOption<T> extends AbstractConfigOption<List<T>, 
         return of(Lists.newArrayList(defaultValues), Pattern::compile);
     }
 
+    @Deprecated
     public static <T extends IForgeRegistryEntry<T>> ParseableListOption<T> ofRegistryItems(IForgeRegistry<T> registry, String... defaultValues) {
         return of(Lists.newArrayList(defaultValues), id -> {
             ResourceLocation key = new ResourceLocation(id);

@@ -27,10 +27,8 @@ public final class ConfigFlagManager {
             return;
         }
 
-        ResourceLocation id = Cuneiform.prefix("config");
-        CraftingHelper.register(new RecipeConfigCondition.Serializer(id));
-
-        Registry.register(Registry.LOOT_CONDITION_TYPE, id, LootConfigCondition.TYPE);
+        CraftingHelper.register(new RecipeConfigCondition.Serializer());
+        Registry.register(Registry.LOOT_CONDITION_TYPE, RecipeConfigCondition.ID, LootConfigCondition.TYPE);
 
         initialized = true;
     }

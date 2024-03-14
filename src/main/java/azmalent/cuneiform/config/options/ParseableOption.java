@@ -35,6 +35,7 @@ public final class ParseableOption<T> extends AbstractConfigOption<T, String> im
         return of(defaultValue, Pattern::compile);
     }
 
+    @Deprecated
     public static <T extends IForgeRegistryEntry<T>> ParseableOption<T> ofRegistryItem(IForgeRegistry<T> registry, ResourceLocation defaultId) {
         return of(defaultId.toString(), id -> {
             ResourceLocation key = new ResourceLocation(id);
