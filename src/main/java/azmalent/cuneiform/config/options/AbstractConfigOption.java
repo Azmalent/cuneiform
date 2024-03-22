@@ -9,7 +9,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public abstract class AbstractConfigOption<TGet, TSet> implements Supplier<TGet> {
     @Override
     public abstract TGet get();

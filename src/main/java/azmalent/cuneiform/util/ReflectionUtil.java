@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
 public final class ReflectionUtil {
     private static final Map<Class<?>, RecordComponent[]> recordCache = Maps.newHashMap();
 

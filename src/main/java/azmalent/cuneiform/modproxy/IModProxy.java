@@ -1,4 +1,4 @@
-package azmalent.cuneiform.integration;
+package azmalent.cuneiform.modproxy;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 

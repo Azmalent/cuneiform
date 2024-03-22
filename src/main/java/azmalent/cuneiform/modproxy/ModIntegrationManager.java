@@ -1,4 +1,4 @@
-package azmalent.cuneiform.integration;
+package azmalent.cuneiform.modproxy;
 
 import azmalent.cuneiform.Cuneiform;
 import azmalent.cuneiform.util.ReflectionUtil;
@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"rawtypes", "unused"})
+@SuppressWarnings("rawtypes")
 public class ModIntegrationManager {
     @SuppressWarnings("unchecked")
     public static void initModProxies(Class containerClass, String modid) {
@@ -28,8 +28,7 @@ public class ModIntegrationManager {
                 Object proxy = createProxy(modid, targetModid, dummies.get(targetModid), field.getType());
                 field.set(instance, proxy);
             } catch (Exception e) {
-                Cuneiform.LOGGER.error(String.format("Failed to instantiate proxy for mod %s!", targetModid));
-                Cuneiform.LOGGER.catching(e);
+                Cuneiform.LOGGER.error(String.format("Failed to instantiate proxy for mod %s!", targetModid), e);
             }
         }
     }

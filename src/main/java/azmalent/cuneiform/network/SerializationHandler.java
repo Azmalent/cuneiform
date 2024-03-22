@@ -23,7 +23,7 @@ import java.util.UUID;
  * Loosely based on <a href="https://github.com/VazkiiMods/AutoRegLib/blob/master/src/main/java/vazkii/arl/network/MessageSerializer.java">MessageSerializer.java</a>
  * from AutoRegLib.
  */
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings("unchecked")
 public final class SerializationHandler {
     private static final Map<Class<?>, INetworkSerializer<?>> serializers = Maps.newHashMap();
 

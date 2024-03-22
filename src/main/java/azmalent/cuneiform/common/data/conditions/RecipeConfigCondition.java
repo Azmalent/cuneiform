@@ -21,8 +21,7 @@ public record RecipeConfigCondition(String modid, String flag) implements ICondi
     }
 
     @Override
-    @SuppressWarnings("removal")
-    public boolean test() {
+    public boolean test(IContext context) {
         return ConfigFlagManager.getFlag(modid, flag);
     }
 

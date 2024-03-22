@@ -2,7 +2,6 @@ package azmalent.cuneiform.config.options;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-@SuppressWarnings("unused")
 public final class IntOption extends NumericOption<Integer> {
     private IntOption(int defaultValue) {
         super(defaultValue);

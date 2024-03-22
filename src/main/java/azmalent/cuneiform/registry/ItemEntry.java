@@ -9,12 +9,11 @@ import net.minecraftforge.registries.RegistryObject;
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class ItemEntry<T extends Item> implements Supplier<T>, ItemLike {
     private final RegistryObject<T> item;
 
     public ItemEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor) {
-        item = registryHelper.getOrCreateRegistry(ForgeRegistries.ITEMS).register(id, constructor);
+        item = registryHelper.getRegister(ForgeRegistries.ITEMS).register(id, constructor);
     }
 
     @Override

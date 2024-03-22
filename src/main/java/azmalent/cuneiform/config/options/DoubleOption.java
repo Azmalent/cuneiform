@@ -2,7 +2,6 @@ package azmalent.cuneiform.config.options;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-@SuppressWarnings("unused")
 public final class DoubleOption extends NumericOption<Double> {
     private DoubleOption(double defaultValue) {
         super(defaultValue);

@@ -2,7 +2,6 @@ package azmalent.cuneiform.util;
 
 import org.apache.commons.lang3.StringUtils;
 
-@SuppressWarnings("unused")
 public final class StringUtil {
     public static String splitCamelCase(String string) {
         String[] words = StringUtils.splitByCharacterTypeCamelCase(string);

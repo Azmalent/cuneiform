@@ -5,26 +5,22 @@ import azmalent.cuneiform.common.crafting.StrippingByproductRecipe;
 import azmalent.cuneiform.common.data.FuelHandler;
 import azmalent.cuneiform.common.data.WanderingTraderHandler;
 import azmalent.cuneiform.common.data.conditions.ConfigFlagManager;
-import azmalent.cuneiform.filter.FilteringHandler;
 import azmalent.cuneiform.network.CuneiformNetwork;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.IForgeRegistry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Mod(Cuneiform.MODID)
-@SuppressWarnings({"unused"})
 public final class Cuneiform {
     public static final String MODID = "cuneiform";
-    public static final Logger LOGGER = LogManager.getLogger(MODID);
+    public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
     /*
         TODO:
@@ -36,25 +32,26 @@ public final class Cuneiform {
         CuneiformConfig.INSTANCE.register();
         CuneiformConfig.INSTANCE.sync(); //To enable filtering early
 
-        if (CuneiformConfig.Filtering.enabled.get()) {
-            FilteringHandler.applyLogFilter();
-        }
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modBus.addListener(Cuneiform::registerRecipeTypes);
+        modBus.addListener(ConfigFlagManager::setup);
 
-        FMLJavaModLoadingContext.get().getModEventBus().register(ConfigFlagManager.class);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(RecipeSerializer.class, Cuneiform::registerRecipeTypes);
-
-        MinecraftForge.EVENT_BUS.addListener(Cuneiform::registerCommands);
-        MinecraftForge.EVENT_BUS.addListener(FuelHandler::getBurnTime);
-        MinecraftForge.EVENT_BUS.addListener(WanderingTraderHandler::registerTrades);
+        IEventBus eventBus = MinecraftForge.EVENT_BUS;
+        eventBus.addListener(Cuneiform::registerCommands);
+        eventBus.addListener(FuelHandler::getBurnTime);
+        eventBus.addListener(WanderingTraderHandler::registerTrades);
 
         CuneiformNetwork.registerMessages();
     }
 
-    private static void registerRecipeTypes(RegistryEvent.Register<RecipeSerializer<?>> event) {
-        IForgeRegistry<RecipeSerializer<?>> serializers = event.getRegistry();
+    private static void registerRecipeTypes(RegisterEvent event) {
+        event.register(ForgeRegistries.Keys.RECIPE_TYPES, helper -> {
+            helper.register(StrippingByproductRecipe.TYPE_ID,StrippingByproductRecipe.TYPE);
+        });
 
-        Registry.register(Registry.RECIPE_TYPE, StrippingByproductRecipe.TYPE_ID, StrippingByproductRecipe.TYPE);
-        serializers.register(StrippingByproductRecipe.Serializer.INSTANCE.setRegistryName(StrippingByproductRecipe.TYPE_ID));
+        event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
+            helper.register(StrippingByproductRecipe.TYPE_ID, StrippingByproductRecipe.Serializer.INSTANCE);
+        });
     }
 
     private static void registerCommands(final RegisterCommandsEvent event) {

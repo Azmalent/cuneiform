@@ -4,10 +4,9 @@ import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -22,52 +21,45 @@ import java.util.List;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
-@SuppressWarnings("unused")
 public final class ClientUtil {
     public static Level getClientLevel() {
         return Minecraft.getInstance().level;
     }
 
     public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip) {
-        addEffectsTooltip(effects, tooltip, 1);
-    }
+        MutableComponent noEffect = (Component.translatable("effect.none")).withStyle(ChatFormatting.GRAY);
 
-    public static void addEffectsTooltip(List<MobEffectInstance> effects, List<Component> tooltip, float durationMultiplier) {
-        if (effects.isEmpty()) {
-            MutableComponent noEffect = (new TranslatableComponent("effect.none")).withStyle(ChatFormatting.GRAY);
-            tooltip.add(noEffect);
-            return;
-        }
-
-        List<Pair<Attribute, AttributeModifier>> attributeModifiers = Lists.newArrayList();
-
-        for(MobEffectInstance effectInstance : effects) {
-            MutableComponent line = new TranslatableComponent(effectInstance.getDescriptionId());
-            MobEffect effect = effectInstance.getEffect();
-            Map<Attribute, AttributeModifier> map = effect.getAttributeModifiers();
-            if (!map.isEmpty()) {
-                for(Map.Entry<Attribute, AttributeModifier> entry : map.entrySet()) {
-                    AttributeModifier attributemodifier = entry.getValue();
-                    AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), effect.getAttributeModifierValue(effectInstance.getAmplifier(), attributemodifier), attributemodifier.getOperation());
-                    attributeModifiers.add(new Pair<>(entry.getKey(), attributemodifier1));
+        List<Pair<Attribute, AttributeModifier>> list1 = Lists.newArrayList();
+        if (effects.isEmpty()) tooltip.add(noEffect);
+        else {
+            for(MobEffectInstance effectInstance : effects) {
+                MutableComponent line = Component.translatable(effectInstance.getEffect().getDescriptionId());
+                MobEffect effect = effectInstance.getEffect();
+                Map<Attribute, AttributeModifier> map = effect.getAttributeModifiers();
+                if (!map.isEmpty()) {
+                    for(Map.Entry<Attribute, AttributeModifier> entry : map.entrySet()) {
+                        AttributeModifier attributemodifier = entry.getValue();
+                        AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), effect.getAttributeModifierValue(effectInstance.getAmplifier(), attributemodifier), attributemodifier.getOperation());
+                        list1.add(new Pair<>(entry.getKey(), attributemodifier1));
+                    }
                 }
-            }
 
-            if (effectInstance.getAmplifier() > 0) {
-                line = new TranslatableComponent("potion.withAmplifier", line, new TranslatableComponent("potion.potency." + effectInstance.getAmplifier()));
-            }
-            else if (effectInstance.getDuration() > 20) {
-                line = new TranslatableComponent("potion.withDuration", line, MobEffectUtil.formatDuration(effectInstance, durationMultiplier));
-            }
+                if (effectInstance.getAmplifier() > 0) {
+                    line = Component.translatable("potion.withAmplifier", line, Component.translatable("potion.potency." + effectInstance.getAmplifier()));
+                }
+                else if (effectInstance.getDuration() > 20) {
+                    line = Component.translatable("potion.withDuration", line, MobEffectUtil.formatDuration(effectInstance, 1));
+                }
 
-            tooltip.add(line.withStyle(effect.getCategory().getTooltipFormatting()));
+                tooltip.add(line.withStyle(effect.getCategory().getTooltipFormatting()));
+            }
         }
 
-        if (!attributeModifiers.isEmpty()) {
-            tooltip.add(TextComponent.EMPTY);
-            tooltip.add((new TranslatableComponent("potion.whenDrank")).withStyle(ChatFormatting.DARK_PURPLE));
+        if (!list1.isEmpty()) {
+            tooltip.add(CommonComponents.EMPTY);
+            tooltip.add(Component.translatable("potion.whenDrank").withStyle(ChatFormatting.DARK_PURPLE));
 
-            for(Pair<Attribute, AttributeModifier> pair : attributeModifiers) {
+            for(Pair<Attribute, AttributeModifier> pair : list1) {
                 AttributeModifier modifier = pair.getSecond();
                 double amount = modifier.getAmount();
                 if (amount == 0) continue;
@@ -80,12 +72,12 @@ public final class ClientUtil {
                 if (amount < 0.0D) d1 *= -1.0D;
 
                 tooltip.add((
-                        new TranslatableComponent(
-                            String.format("attribute.modifier.%s.%d", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
-                            ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                            new TranslatableComponent(pair.getFirst().getDescriptionId())
-                        )
-                    ).withStyle(amount > 0 ? ChatFormatting.BLUE : ChatFormatting.RED));
+                                Component.translatable(
+                                    String.format("attribute.modifier.%s.%d", amount > 0 ? "plus" : "take", modifier.getOperation().toValue()),
+                                    ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                    Component.translatable(pair.getFirst().getDescriptionId())
+                                )
+                            ).withStyle(amount > 0 ? ChatFormatting.BLUE : ChatFormatting.RED));
             }
         }
     }

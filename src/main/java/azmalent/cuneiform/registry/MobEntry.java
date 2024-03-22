@@ -3,18 +3,13 @@ package azmalent.cuneiform.registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnPlacements.SpawnPredicate;
-import net.minecraft.world.entity.SpawnPlacements.Type;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class MobEntry<T extends Mob> extends EntityEntry<T> {
     public final ItemEntry<ForgeSpawnEggItem> SPAWN_EGG;
 
@@ -53,7 +48,7 @@ public class MobEntry<T extends Mob> extends EntityEntry<T> {
         }
 
         public MobEntry<T> build() {
-            var registry = helper.getOrCreateRegistry(ForgeRegistries.ENTITIES);
+            var registry = helper.getRegister(ForgeRegistries.ENTITY_TYPES);
             var type = registry.register(id, () -> typeBuilder.build(new ResourceLocation(helper.modid, id).toString()));
             var egg = spawnEgg ? helper.createSpawnEgg(id, type, primaryEggColor, secondaryEggColor) : null;
 

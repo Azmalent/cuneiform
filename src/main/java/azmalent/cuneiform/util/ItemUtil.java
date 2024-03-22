@@ -8,7 +8,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
-@SuppressWarnings("unused")
 public final class ItemUtil {
     public static Block getBlockFromItem(ItemStack stack) {
         Item item = stack.getItem();

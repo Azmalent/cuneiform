@@ -10,7 +10,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,9 +25,11 @@ public class AxeItemMixin {
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
 
-        for (Recipe<RecipeWrapper> recipe : CraftingUtil.getRecipesByType(level, StrippingByproductRecipe.TYPE).values()) {
+        for (Recipe<?> recipe : CraftingUtil.getRecipesByType(level, StrippingByproductRecipe.TYPE).values()) {
             if (recipe instanceof StrippingByproductRecipe strippingRecipe) {
-                if (strippingRecipe.matches(state) && level.random.nextFloat() < strippingRecipe.getChance()) {
+                float chance = strippingRecipe.getChance();
+
+                if (strippingRecipe.matches(state) && level.random.nextFloat() < chance) {
                     Block.popResource(level, pos, strippingRecipe.getOutput());
                 }
             }

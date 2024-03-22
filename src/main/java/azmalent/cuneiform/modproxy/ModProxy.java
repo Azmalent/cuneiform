@@ -1,4 +1,4 @@
-package azmalent.cuneiform.integration;
+package azmalent.cuneiform.modproxy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

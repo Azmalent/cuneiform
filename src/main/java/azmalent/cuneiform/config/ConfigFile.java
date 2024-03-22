@@ -1,19 +1,14 @@
 package azmalent.cuneiform.config;
 
 import azmalent.cuneiform.Cuneiform;
-import azmalent.cuneiform.CuneiformConfig;
 import azmalent.cuneiform.common.data.conditions.ConfigFlagManager;
 import azmalent.cuneiform.config.options.AbstractConfigOption;
 import azmalent.cuneiform.config.options.BooleanOption;
-import azmalent.cuneiform.config.options.IParseableOption;
 import azmalent.cuneiform.util.ReflectionUtil;
 import azmalent.cuneiform.util.StringUtil;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -22,12 +17,9 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.List;
 
-@SuppressWarnings("unused")
+//TODO: rewrite config system
 public abstract class ConfigFile {
-    private final List<IParseableOption> parseableCache = Lists.newArrayList();
-
     protected final String modid;
     protected final ModConfig.Type configType;
     protected ForgeConfigSpec spec;
@@ -58,8 +50,6 @@ public abstract class ConfigFile {
                                 "Ignoring as flags are only usable in common config files")
                                 .formatted(b.getConfigFlag(), getConfigFilename()));
                         }
-                    } else if (option instanceof IParseableOption p) {
-                        parseableCache.add(p);
                     }
                 }
             } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -121,7 +111,6 @@ public abstract class ConfigFile {
 
     protected void onFileChange() {
         Cuneiform.LOGGER.info("Reloading config file " + getConfigFilename());
-        parseableCache.forEach(IParseableOption::invalidate);
     }
 
     public void sync() {

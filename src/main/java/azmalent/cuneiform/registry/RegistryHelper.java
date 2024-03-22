@@ -2,11 +2,12 @@ package azmalent.cuneiform.registry;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
@@ -14,17 +15,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -33,13 +29,11 @@ import java.util.Queue;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class RegistryHelper {
     public final String modid;
     public final CreativeModeTab defaultTab;
-    private final Map<ResourceKey<?>, DeferredRegister<?>> registries = Maps.newHashMap();
+    private final Map<ResourceKey<?>, DeferredRegister<?>> deferredRegisters = Maps.newHashMap();
 
-    private Queue<Pair<BlockEntry<?>, BlockRenderType>> renderTypes = Lists.newLinkedList();
     private Queue<Pair<EntityEntry<? extends LivingEntity>, Supplier<AttributeSupplier>>> attributeSuppliers = Lists.newLinkedList();
 
     public RegistryHelper(String modid) {
@@ -52,25 +46,19 @@ public class RegistryHelper {
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(this::onAttributeCreation);
-
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            bus.addListener((FMLClientSetupEvent event) -> {
-                event.enqueueWork(this::initRenderTypes);
-            });
-        });
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IForgeRegistryEntry<T>> DeferredRegister<T> getOrCreateRegistry(ResourceKey<? extends Registry<T>> registryKey) {
-        if (!registries.containsKey(registryKey)) {
-            registries.put(registryKey, DeferredRegister.create(registryKey, modid));
+    public <T> DeferredRegister<T> getRegister(ResourceKey<? extends Registry<T>> registryKey) {
+        if (!deferredRegisters.containsKey(registryKey)) {
+            deferredRegisters.put(registryKey, DeferredRegister.create(registryKey, modid));
         }
 
-        return (DeferredRegister<T>) registries.get(registryKey);
+        return (DeferredRegister<T>) deferredRegisters.get(registryKey);
     }
 
-    public <T extends IForgeRegistryEntry<T>> DeferredRegister<T> getOrCreateRegistry(IForgeRegistry<T> registry) {
-        return getOrCreateRegistry(registry.getRegistryKey());
+    public <T> DeferredRegister<T> getRegister(IForgeRegistry<T> registry) {
+        return getRegister(registry.getRegistryKey());
     }
 
     //Blocks
@@ -149,38 +137,5 @@ public class RegistryHelper {
         }
 
         attributeSuppliers = null;
-    }
-
-    //Render types
-    public final void setBlockRenderType(BlockEntry<?> blockEntry, BlockRenderType renderType) {
-        if (renderTypes == null) {
-            throw new IllegalStateException("Render types already initialized");
-        }
-
-        renderTypes.add(Pair.of(blockEntry, renderType));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public final void initRenderTypes() {
-        while(!renderTypes.isEmpty()) {
-            var pair = renderTypes.poll();
-            ItemBlockRenderTypes.setRenderLayer(pair.getLeft().get(), pair.getRight().get());
-        }
-
-        renderTypes = null;
-    }
-
-    public enum BlockRenderType {
-        SOLID, CUTOUT, CUTOUT_MIPPED, TRANSCULENT;
-
-        @OnlyIn(Dist.CLIENT)
-        public RenderType get() {
-            return switch (this) {
-                case SOLID -> RenderType.solid();
-                case CUTOUT -> RenderType.cutout();
-                case CUTOUT_MIPPED -> RenderType.cutoutMipped();
-                case TRANSCULENT -> RenderType.translucent();
-            };
-        }
     }
 }

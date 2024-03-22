@@ -9,7 +9,6 @@ import net.minecraft.Util;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unused")
 public final class MapOption<TValue> extends BasicOption<Config> {
     @SuppressWarnings("unchecked")
     private MapOption(Map<String, TValue> defaultValue) {

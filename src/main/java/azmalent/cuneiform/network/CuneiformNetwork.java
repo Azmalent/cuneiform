@@ -5,7 +5,6 @@ import azmalent.cuneiform.network.message.S2CSpawnParticleMessage;
 import com.mojang.math.Vector3d;
 import net.minecraft.core.particles.SimpleParticleType;
 
-@SuppressWarnings("unused")
 public final class CuneiformNetwork {
     public static final CuneiformChannel CHANNEL = new CuneiformChannel(Cuneiform.prefix("channel"), 1);
 

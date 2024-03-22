@@ -4,7 +4,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 
-@SuppressWarnings("unused")
 public final class StringOption extends BasicOption<String> {
     private StringOption(String defaultValue) {
         super(defaultValue);

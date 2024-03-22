@@ -5,24 +5,21 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
-import org.apache.commons.lang3.StringUtils;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public final class ConfigFlagManager {
     public static final Map<String, Map<String, Supplier<Boolean>>> flagsByModid = new HashMap<>();
 
     private static boolean initialized = false;
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void registerConfigConditions(RegistryEvent.Register<?> event) {
+    @SubscribeEvent
+    public static void setup(FMLCommonSetupEvent event) {
         if (initialized) {
             return;
         }

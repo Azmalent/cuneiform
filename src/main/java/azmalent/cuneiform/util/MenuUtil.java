@@ -6,8 +6,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-@SuppressWarnings("unused")
-public final class ContainerUtil {
+public final class MenuUtil {
     public static final int PLAYER_INVENTORY_X = 8;
     public static final int PLAYER_INVENTORY_Y = 84;
     public static final int HOTBAR_Y = 142;

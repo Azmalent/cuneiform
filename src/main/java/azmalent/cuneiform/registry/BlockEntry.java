@@ -1,9 +1,11 @@
 package azmalent.cuneiform.registry;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
@@ -11,14 +13,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static net.minecraftforge.registries.ForgeRegistries.*;
+import static net.minecraftforge.registries.ForgeRegistries.BLOCKS;
+import static net.minecraftforge.registries.ForgeRegistries.ITEMS;
 
-@SuppressWarnings("unused")
 public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
     public final RegistryObject<T> block;
 
     private BlockEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor) {
-        block = registryHelper.getOrCreateRegistry(BLOCKS).register(id, constructor);
+        block = registryHelper.getRegister(BLOCKS).register(id, constructor);
     }
 
     private BlockEntry(RegistryHelper registryHelper,String id, Supplier<T> constructor, CreativeModeTab creativeTab) {
@@ -28,8 +30,8 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
     }
 
     private BlockEntry(RegistryHelper registryHelper, String id, Supplier<T> constructor, Function<Block, ? extends BlockItem> itemConstructor) {
-        block = registryHelper.getOrCreateRegistry(BLOCKS).register(id, constructor);
-        registryHelper.getOrCreateRegistry(ITEMS).register(id, () -> itemConstructor.apply(block.get()));
+        block = registryHelper.getRegister(BLOCKS).register(id, constructor);
+        registryHelper.getRegister(ITEMS).register(id, () -> itemConstructor.apply(block.get()));
     }
 
     public boolean hasItemForm() {
@@ -57,7 +59,8 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
     @Nonnull
     public Item asItem() {
         if (!hasItemForm()) {
-            throw new NullPointerException(String.format("The block %s doesn't have an item form!", get().getRegistryName()));
+            ResourceLocation id = ForgeRegistries.BLOCKS.getKey(this.get());
+            throw new NullPointerException(String.format("The block %s doesn't have an item form!", id));
         }
 
         return block.get().asItem();
@@ -70,9 +73,6 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
         protected Supplier<T> constructor;
         protected Function<Block, ? extends BlockItem> blockItemConstructor;
         protected boolean noItemForm = false;
-
-        protected RegistryHelper.BlockRenderType renderType = RegistryHelper.BlockRenderType.SOLID;
-
         public Builder(RegistryHelper helper, String id, Supplier<T> constructor) {
             this.helper = helper;
             this.id = id;
@@ -93,10 +93,6 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
             }
             else {
                 entry = new BlockEntry<T>(helper, id, constructor, helper.defaultTab);
-            }
-
-            if (renderType != RegistryHelper.BlockRenderType.SOLID) {
-                helper.setBlockRenderType(entry, renderType);
             }
 
             return entry;
@@ -144,24 +140,6 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
         public Builder<T> noItemForm() {
             this.noItemForm = true;
             return this;
-        }
-
-        //Render types
-        public Builder<T> renderType(RegistryHelper.BlockRenderType type) {
-            this.renderType = type;
-            return this;
-        }
-
-        public Builder<T> cutoutRender() {
-            return this.renderType(RegistryHelper.BlockRenderType.CUTOUT);
-        }
-
-        public Builder<T> cutoutMippedRender() {
-            return this.renderType(RegistryHelper.BlockRenderType.CUTOUT_MIPPED);
-        }
-
-        public Builder<T> transculentRender() {
-            return this.renderType(RegistryHelper.BlockRenderType.TRANSCULENT);
         }
     }
 }

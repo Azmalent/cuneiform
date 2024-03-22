@@ -12,7 +12,6 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class EntityEntry<T extends Entity> implements Supplier<EntityType<T>> {
     private final RegistryObject<EntityType<T>> TYPE;
 
@@ -21,7 +20,7 @@ public class EntityEntry<T extends Entity> implements Supplier<EntityType<T>> {
     }
 
     public EntityEntry(RegistryHelper helper, String id, EntityType.Builder<T> builder) {
-        var registry = helper.getOrCreateRegistry(ForgeRegistries.ENTITIES);
+        var registry = helper.getRegister(ForgeRegistries.ENTITY_TYPES);
         TYPE = registry.register(id, () -> builder.build(new ResourceLocation(helper.modid, id).toString()));
     }
 

@@ -1,6 +1,7 @@
 package azmalent.cuneiform.common.trade;
 
 import net.minecraft.Util;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
@@ -8,7 +9,6 @@ import net.minecraft.world.item.trading.MerchantOffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class RandomItemSaleListing implements VillagerTrades.ItemListing {
     private final ItemStack input;
@@ -37,7 +37,7 @@ public class RandomItemSaleListing implements VillagerTrades.ItemListing {
 
     @Nullable
     @Override
-    public MerchantOffer getOffer(@Nonnull Entity trader, @Nonnull Random rand) {
+    public MerchantOffer getOffer(@Nonnull Entity trader, @Nonnull RandomSource rand) {
         ItemStack itemForSale = Util.getRandom(outputs, rand);
         return new MerchantOffer(input, input2, itemForSale, maxTrades, xp, priceMult);
     }

@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
 public final class CraftingUtil {
     public static <C extends Container, T extends Recipe<C>> Map<ResourceLocation, Recipe<C>> getRecipesByType(Level world, RecipeType<T> type) {
         return ((RecipeManagerAccessor) world.getRecipeManager()).cuneiform_byType(type);

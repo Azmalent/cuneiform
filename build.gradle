@@ -1,50 +1,34 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        maven { url = 'https://repo.spongepowered.org/maven' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
-        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
-        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
-    }
+//file:noinspection SpellCheckingInspection
+plugins {
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.16, 6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'org.spongepowered.mixin'
+group = "azmalent"
+version = "${minecraft_version}-${mod_version}"
 
-ext.configFile = file('build.properties')
-ext.config = parseConfig(configFile)
+base {
+    archivesName = modid
+}
 
-version = "${config.minecraft_version}-${config.mod_version}"
-group = "azmalent.${config.modid}"
-archivesBaseName = config.modid
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-compileJava.options.compilerArgs << "-Xlint:all,-processing,-varargs"
-
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
 minecraft {
-    mappings channel: config.mappings_channel, version: config.mappings_version
+    mappings channel: 'parchment', version: "${mappings_version}-${minecraft_version}"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
             workingDirectory project.file('run')
-            arg "-mixin.config=cuneiform.mixins.json"
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
+            taskName 'Client'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                cuneiform {
+                modClientRun {
                     source sourceSets.main
                 }
             }
@@ -52,12 +36,11 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-            arg "-mixin.config=cuneiform.mixins.json"
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
+            taskName 'Server'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                cuneiform {
+                modServerRun {
                     source sourceSets.main
                 }
             }
@@ -65,13 +48,12 @@ minecraft {
 
         data {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'cuneiform', '--all', '--output', file('src/generated/resources/')
-
+            args '--mod', modid, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            taskName 'Data'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                cuneiform {
+                modDataRun {
                     source sourceSets.main
                 }
             }
@@ -79,56 +61,67 @@ minecraft {
     }
 }
 
-mixin {
-    add sourceSets.main, "${config.modid}.mixins.refmap.json"
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    maven { // JEI
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${config.minecraft_version}-${config.forge_version}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
+}
+
+mixin {
+    add sourceSets.main, "${modid}.mixins.refmap.json"
+    config "${modid}.mixins.json"
 }
 
 processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
+    var replaceProperties = [
+            'mod_name': mod_name, 'mod_version': project.version,
+            'mod_description': mod_description, 'mod_license': mod_license,
+            'mod_homepage': mod_homepage, 'mod_github': mod_github,
+            'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
+            'fml_min': fml_min, 'forge_version': forge_version
+    ]
 
-        expand 'mod_name': config.mod_name, 'mod_version': config.mod_version,
-                'minecraft_version': config.minecraft_version, 'minecraft_version_range': config.minecraft_version_range,
-                'fml_min': config.fml_min, 'forge_version': config.forge_version
+    inputs.properties replaceProperties
+
+    filesMatching('META-INF/mods.toml') {
+        expand replaceProperties + [project: project]
     }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
-
-    duplicatesStrategy 'include'
 }
 
 jar {
     manifest {
         attributes([
-                "Specification-Title": "${config.modid}",
+                "Specification-Title": modid,
                 "Specification-Vendor": "azmalent",
                 "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": "${config.modid}",
-                "Implementation-Version": "${config.mod_version}",
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.jar.archiveVersion,
                 "Implementation-Vendor": "azmalent",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
 
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                "MixinConfigs": "${config.modid}.mixins.json",
+                "MixinConfigs": "${modid}.mixins.json",
                 'FMLCorePluginContainsFMLMod': 'true',
                 'ForceLoadAsMod': 'true'
         ])
     }
+
+    finalizedBy 'reobfJar'
 }
 
-static def parseConfig(File config) {
-    config.withReader {
-        def prop = new Properties()
-        prop.load(it)
-        return (new ConfigSlurper().parse(prop))
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:all,-deprecation,-processing"
 }
-
-jar.finalizedBy('reobfJar')

@@ -1,6 +1,8 @@
 modLoader="javafml"
 loaderVersion="[${fml_min},)"
-license="GPL v3.0"
+license="${mod_license}"
+displayURL="${mod_homepage}"
+issueTrackerURL="${mod_github}/issues"
 
 [[mods]]
 modId="cuneiform"
@@ -8,9 +10,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 logoFile="cuneiform.png"
 authors="Azmalent"
-description='''
-Yet another library for Minecraft modding.
-'''
+description="${mod_description}"
 
 [[dependencies.cuneiform]]
     modId="forge"

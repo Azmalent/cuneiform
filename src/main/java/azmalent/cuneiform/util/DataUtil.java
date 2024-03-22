@@ -13,7 +13,6 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import java.util.List;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public final class DataUtil {
     public static void registerFlammable(Supplier<? extends Block> block, int flameOdds, int burnOdds) {
         FireBlockAccessor fire = (FireBlockAccessor) Blocks.FIRE;

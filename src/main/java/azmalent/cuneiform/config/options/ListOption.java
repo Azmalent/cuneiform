@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
 public final class ListOption<T> extends BasicOption<List<? extends T>> {
     private final Predicate<T> validator;
 

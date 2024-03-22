@@ -12,7 +12,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.StringUtils;
 
-@SuppressWarnings("unused")
 public final class TagUtil {
     public TagKey<Block> blockTag(String modid, String name) {
         return BlockTags.create(new ResourceLocation(modid, name));

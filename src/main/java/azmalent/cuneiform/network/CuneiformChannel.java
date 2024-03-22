@@ -9,7 +9,6 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-@SuppressWarnings("unused")
 public class CuneiformChannel {
     private final SimpleChannel channel;
     private int index = 0;

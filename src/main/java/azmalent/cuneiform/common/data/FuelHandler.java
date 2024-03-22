@@ -7,7 +7,6 @@ import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public final class FuelHandler {
     private static final Map<Item, Integer> FUELS = Maps.newHashMap();
 

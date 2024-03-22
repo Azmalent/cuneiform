@@ -16,14 +16,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class BlockEntityEntry<T extends BlockEntity> implements Supplier<BlockEntityType<T>> {
     public final RegistryObject<BlockEntityType<T>> type;
 
     @SafeVarargs
     @SuppressWarnings("ConstantConditions")
     public BlockEntityEntry(RegistryHelper helper, String id, BlockEntitySupplier<T> constructor, @Nonnull Supplier<? extends Block>... blockSuppliers) {
-        this.type = helper.getOrCreateRegistry(ForgeRegistries.BLOCK_ENTITIES).register(id, () -> {
+        this.type = helper.getRegister(ForgeRegistries.BLOCK_ENTITY_TYPES).register(id, () -> {
             Block[] blocks = Arrays.stream(blockSuppliers).map(Supplier::get).toArray(Block[]::new);
             return BlockEntityType.Builder.of(constructor, blocks).build(null);
         });;
@@ -31,7 +30,7 @@ public class BlockEntityEntry<T extends BlockEntity> implements Supplier<BlockEn
 
     @SuppressWarnings("ConstantConditions")
     public BlockEntityEntry(RegistryHelper helper, String id, BlockEntitySupplier<T> constructor, List<Supplier<? extends Block>> blockSuppliers) {
-        this.type = helper.getOrCreateRegistry(ForgeRegistries.BLOCK_ENTITIES).register(id, () -> {
+        this.type = helper.getRegister(ForgeRegistries.BLOCK_ENTITY_TYPES).register(id, () -> {
             Block[] blocks = blockSuppliers.stream().map(Supplier::get).toArray(Block[]::new);
             return BlockEntityType.Builder.of(constructor, blocks).build(null);
         });;

@@ -7,7 +7,6 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.common.BasicItemListing;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("unused")
 public final class TradeBuilder {
     private final ItemStack input;
     private final ItemStack input2;

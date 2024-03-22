@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 
-@SuppressWarnings("unused")
 public abstract class AbstractCommand {
     public abstract void register(CommandDispatcher<CommandSourceStack> dispatcher);
 

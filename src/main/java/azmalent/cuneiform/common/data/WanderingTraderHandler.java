@@ -7,7 +7,6 @@ import net.minecraftforge.event.village.WandererTradesEvent;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public final class WanderingTraderHandler {
     private static final List<VillagerTrades.ItemListing> commonTrades = Lists.newArrayList();
     private static final List<VillagerTrades.ItemListing> rareTrades = Lists.newArrayList();
