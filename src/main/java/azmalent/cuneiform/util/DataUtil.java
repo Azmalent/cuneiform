@@ -20,7 +20,7 @@ public final class DataUtil {
     }
 
     public static void registerCompostable(ItemLike itemProvider, float value) {
-        ComposterBlock.COMPOSTABLES.put(itemProvider, value);
+        ComposterBlock.COMPOSTABLES.put(itemProvider.asItem(), value);
     }
 
     @SuppressWarnings("ConstantConditions")
