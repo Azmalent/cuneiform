@@ -3,6 +3,7 @@ package azmalent.cuneiform.network.message;
 import azmalent.cuneiform.network.IMessage;
 import azmalent.cuneiform.util.ClientUtil;
 import com.mojang.math.Vector3d;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -24,7 +25,7 @@ public record S2CSpawnParticleMessage(
 
     @Override
     public void onReceive(NetworkEvent.Context context) {
-        Level level = ClientUtil.getClientLevel();
+        Level level = Minecraft.getInstance().level;
         SimpleParticleType type = (SimpleParticleType) ForgeRegistries.PARTICLE_TYPES.getValue(particleId);
         if (level != null && type != null) {
             level.addParticle(type, xPos, yPos, zPos, xSpeed, ySpeed, zSpeed);

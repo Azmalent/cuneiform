@@ -22,16 +22,10 @@ public final class Cuneiform {
     public static final String MODID = "cuneiform";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-    /*
-        TODO:
-        - List & map support for auto package serializer
-        - Config options for arbitrary objects/records
-     */
+    //TODO: list & map support for auto package serializer
+    //TODO: config support for arbitrary objects/records
+    //TODO: javadocs
     public Cuneiform() {
-        CuneiformConfig.INSTANCE.buildSpec();
-        CuneiformConfig.INSTANCE.register();
-        CuneiformConfig.INSTANCE.sync(); //To enable filtering early
-
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(Cuneiform::registerRecipeTypes);
         modBus.addListener(ConfigFlagManager::setup);
@@ -42,6 +36,12 @@ public final class Cuneiform {
         eventBus.addListener(WanderingTraderHandler::registerTrades);
 
         CuneiformNetwork.registerMessages();
+    }
+
+    private void initConfig() {
+        CuneiformConfig.INSTANCE.buildSpec();
+        CuneiformConfig.INSTANCE.register();
+        CuneiformConfig.INSTANCE.sync();
     }
 
     private static void registerRecipeTypes(RegisterEvent event) {

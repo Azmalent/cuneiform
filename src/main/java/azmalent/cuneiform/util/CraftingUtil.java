@@ -1,6 +1,5 @@
 package azmalent.cuneiform.util;
 
-import azmalent.cuneiform.common.crafting.ShapelessRecipeMatcher;
 import azmalent.cuneiform.mixin.accessor.RecipeManagerAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -28,9 +27,5 @@ public final class CraftingUtil {
         }
 
         return ItemStack.EMPTY;
-    }
-
-    public static ShapelessRecipeMatcher.Builder defineShapelessRecipe() {
-        return new ShapelessRecipeMatcher.Builder();
     }
 }
