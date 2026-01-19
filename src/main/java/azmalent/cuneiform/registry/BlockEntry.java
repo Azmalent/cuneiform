@@ -1,5 +1,6 @@
 package azmalent.cuneiform.registry;
 
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
@@ -122,7 +123,7 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
         }
 
         public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock, Item.Properties properties) {
-            return this.blockItem(block -> new StandingAndWallBlockItem(block, wallBlock.get(), properties));
+            return this.blockItem(block -> new StandingAndWallBlockItem(block, wallBlock.get(), properties, Direction.DOWN));
         }
 
         public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock) {

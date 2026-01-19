@@ -21,6 +21,11 @@ minecraft {
     mappings channel: mappings_channel, version: mappings_version
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
+    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
+    // It is REQUIRED to be set to true for this template to function.
+    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
+    copyIdeResources = true
+
     runs {
         client {
             workingDirectory project.file('run')
@@ -86,11 +91,11 @@ mixin {
 
 processResources {
     var replaceProperties = [
-            'mod_name': mod_name, 'mod_version': project.version,
-            'mod_description': mod_description, 'mod_license': mod_license,
-            'mod_homepage': mod_homepage, 'mod_github': mod_github,
-            'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
-            'fml_min': fml_min, 'forge_version': forge_version
+        'mod_name': mod_name, 'mod_version': project.version,
+        'mod_description': mod_description, 'mod_license': mod_license,
+        'mod_homepage': mod_homepage, 'mod_github': mod_github,
+        'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
+        'fml_min': fml_min, 'forge_version': forge_version
     ]
 
     inputs.properties replaceProperties
