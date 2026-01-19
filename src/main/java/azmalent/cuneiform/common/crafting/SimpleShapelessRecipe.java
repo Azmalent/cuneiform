@@ -2,14 +2,15 @@ package azmalent.cuneiform.common.crafting;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class SimpleShapelessRecipe extends CustomRecipe {
-    public SimpleShapelessRecipe(ResourceLocation id) {
-        super(id);
+    public SimpleShapelessRecipe(ResourceLocation id, CraftingBookCategory category) {
+        super(id, category);
     }
 
     abstract protected ShapelessRecipeMatcher getMatcher();

@@ -25,8 +25,8 @@ public final class Cuneiform {
     //TODO: list & map support for auto package serializer
     //TODO: config support for arbitrary objects/records
     //TODO: javadocs
-    public Cuneiform() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public Cuneiform(FMLJavaModLoadingContext context) {
+        IEventBus modBus = context.getModEventBus();
         modBus.addListener(Cuneiform::registerRecipeTypes);
         modBus.addListener(ConfigFlagManager::setup);
 
@@ -65,6 +65,6 @@ public final class Cuneiform {
     }
 
     public static ResourceLocation prefix(String name) {
-        return new ResourceLocation(MODID, name);
+        return ResourceLocation.fromNamespaceAndPath(MODID, name);
     }
 }

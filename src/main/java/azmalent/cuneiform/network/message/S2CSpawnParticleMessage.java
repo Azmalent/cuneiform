@@ -1,12 +1,11 @@
 package azmalent.cuneiform.network.message;
 
 import azmalent.cuneiform.network.IMessage;
-import azmalent.cuneiform.util.ClientUtil;
-import com.mojang.math.Vector3d;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -15,7 +14,7 @@ public record S2CSpawnParticleMessage(
         double xPos, double yPos, double zPos,
         double xSpeed, double ySpeed, double zSpeed) implements IMessage.ServerToClient {
 
-    public S2CSpawnParticleMessage(SimpleParticleType type, Vector3d pos, Vector3d speed) {
+    public S2CSpawnParticleMessage(SimpleParticleType type, Vec3 pos, Vec3 speed) {
         this(ForgeRegistries.PARTICLE_TYPES.getKey(type), pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
     }
 

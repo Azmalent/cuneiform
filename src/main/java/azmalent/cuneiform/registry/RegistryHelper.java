@@ -36,15 +36,11 @@ public class RegistryHelper {
 
     private Queue<Pair<EntityEntry<? extends LivingEntity>, Supplier<AttributeSupplier>>> attributeSuppliers = Lists.newLinkedList();
 
-    public RegistryHelper(String modid) {
-        this(modid, CreativeModeTab.TAB_MISC);
-    }
-
-    public RegistryHelper(String modid, CreativeModeTab defaultTab) {
+    public RegistryHelper(FMLJavaModLoadingContext context, String modid, CreativeModeTab defaultTab) {
         this.modid = modid;
         this.defaultTab = defaultTab;
 
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus bus = context.getModEventBus();
         bus.addListener(this::onAttributeCreation);
     }
 
@@ -88,7 +84,7 @@ public class RegistryHelper {
     }
 
     public ItemEntry<Item> createItem(String id, CreativeModeTab tab) {
-        return createItem(id, new Item.Properties().tab(tab));
+        return createItem(id, new Item.Properties());
     }
 
     public ItemEntry<Item> createItem(String id) {
@@ -96,11 +92,11 @@ public class RegistryHelper {
     }
 
     public ItemEntry<Item> createFood(String id, FoodProperties props) {
-        return createItem(id, new Item.Properties().food(props).tab(CreativeModeTab.TAB_FOOD));
+        return createItem(id, new Item.Properties().food(props));
     }
 
     public <T extends Mob> ItemEntry<ForgeSpawnEggItem> createSpawnEgg(String entityId, Supplier<EntityType<T>> entityType, int primaryColor, int secondaryColor) {
-        return createItem(entityId + "_spawn_egg", () -> new ForgeSpawnEggItem(entityType, primaryColor, secondaryColor, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+        return createItem(entityId + "_spawn_egg", () -> new ForgeSpawnEggItem(entityType, primaryColor, secondaryColor, new Item.Properties()));
     }
 
     //Block Entities

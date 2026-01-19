@@ -2,8 +2,8 @@ package azmalent.cuneiform.network;
 
 import azmalent.cuneiform.Cuneiform;
 import azmalent.cuneiform.network.message.S2CSpawnParticleMessage;
-import com.mojang.math.Vector3d;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.world.phys.Vec3;
 
 public final class CuneiformNetwork {
     public static final CuneiformChannel CHANNEL = new CuneiformChannel(Cuneiform.prefix("channel"), 1);
@@ -12,7 +12,7 @@ public final class CuneiformNetwork {
         CHANNEL.registerMessage(S2CSpawnParticleMessage.class);
     }
 
-    public static void spawnParticle(SimpleParticleType type, Vector3d pos, Vector3d speed) {
+    public static void spawnParticle(SimpleParticleType type, Vec3 pos, Vec3 speed) {
         var message = new S2CSpawnParticleMessage(type, pos, speed);
         CHANNEL.sendToAllPlayers(message);
     }
