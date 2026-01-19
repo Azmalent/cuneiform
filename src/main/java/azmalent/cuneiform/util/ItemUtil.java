@@ -23,7 +23,7 @@ public final class ItemUtil {
     }
 
     public static void damageHeldItem(Player player, InteractionHand hand, int amount) {
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             ItemStack stack = player.getItemInHand(hand);
 
             stack.hurtAndBreak(amount, player, (p) -> {
@@ -37,7 +37,7 @@ public final class ItemUtil {
     }
 
     public static void damageEquippedItem(Player player, EquipmentSlot slot, int amount) {
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             ItemStack stack = player.getItemBySlot(slot);
 
             stack.hurtAndBreak(amount, player, (p) -> {

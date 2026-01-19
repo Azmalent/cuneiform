@@ -25,7 +25,7 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
 
     private BlockEntry(RegistryHelper registryHelper,String id, Supplier<T> constructor, CreativeModeTab creativeTab) {
         this(registryHelper, id, constructor, (block) ->
-           new BlockItem(block, new Item.Properties().tab(creativeTab))
+           new BlockItem(block, new Item.Properties())
         );
     }
 
@@ -109,32 +109,32 @@ public class BlockEntry<T extends Block> implements Supplier<T>, ItemLike {
             return this;
         }
 
-        public Builder<T> blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor, CreativeModeTab group) {
-            return this.blockItem(blockItemConstructor, new Item.Properties().tab(group));
+        public Builder<T> blockItem(BiFunction<Block, Item.Properties, ? extends BlockItem> blockItemConstructor) {
+            return this.blockItem(blockItemConstructor, new Item.Properties());
         }
 
         public Builder<T> tallBlockItem(Item.Properties properties) {
             return this.blockItem(DoubleHighBlockItem::new, properties);
         }
 
-        public Builder<T> tallBlockItem(CreativeModeTab group) {
-            return this.blockItem(DoubleHighBlockItem::new, group);
+        public Builder<T> tallBlockItem() {
+            return this.blockItem(DoubleHighBlockItem::new);
         }
 
         public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock, Item.Properties properties) {
-            return this.blockItem(block -> new StandingAndWallBlockItem(wallBlock.get(), block, properties));
+            return this.blockItem(block -> new StandingAndWallBlockItem(block, wallBlock.get(), properties));
         }
 
-        public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock, CreativeModeTab group) {
-            return this.wallOrFloorItem(wallBlock, new Item.Properties().tab(group));
+        public Builder<T> wallOrFloorItem(BlockEntry<?> wallBlock) {
+            return this.wallOrFloorItem(wallBlock, new Item.Properties());
         }
 
         public Builder<T> blockItem(Item.Properties properties) {
             return this.blockItem(BlockItem::new, properties);
         }
 
-        public Builder<T> blockItem(CreativeModeTab group) {
-            return this.blockItem(new Item.Properties().tab(group));
+        public Builder<T> blockItem() {
+            return this.blockItem(new Item.Properties());
         }
 
         public Builder<T> noItemForm() {

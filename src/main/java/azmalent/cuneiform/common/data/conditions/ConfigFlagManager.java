@@ -3,6 +3,7 @@ package azmalent.cuneiform.common.data.conditions;
 import azmalent.cuneiform.Cuneiform;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,7 +26,7 @@ public final class ConfigFlagManager {
         }
 
         CraftingHelper.register(new RecipeConfigCondition.Serializer());
-        Registry.register(Registry.LOOT_CONDITION_TYPE, RecipeConfigCondition.ID, LootConfigCondition.TYPE);
+        Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, RecipeConfigCondition.ID, LootConfigCondition.TYPE);
 
         initialized = true;
     }
