@@ -12,8 +12,30 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages runtime injection of mod integration proxies via annotation scanning.
+ *
+ * <p>During mod construction, call {@link #initModProxies(Class, String)} with
+ * the class containing {@link ModProxy @ModProxy}-annotated fields. The manager
+ * will:</p>
+ * <ol>
+ *   <li>Find all fields annotated with {@link ModProxy} in the container class</li>
+ *   <li>For each field, check if the target mod is loaded</li>
+ *   <li>Instantiate the appropriate implementation ({@link IntegrationImpl} or {@link IntegrationDummy})</li>
+ *   <li>Inject the instance into the field</li>
+ * </ol>
+ *
+ * <p>Annotation data is obtained via Forge's {@link ModFileScanData} to avoid
+ * loading implementation classes prematurely.</p>
+ */
 @SuppressWarnings("rawtypes")
 public class ModIntegrationManager {
+    /**
+     * Initializes all {@link ModProxy @ModProxy}-annotated fields in the given container class.
+     *
+     * @param containerClass the class containing proxy fields
+     * @param modid the mod ID used to scan for annotation data
+     */
     @SuppressWarnings("unchecked")
     public static void initModProxies(Class containerClass, String modid) {
         Object instance = ReflectionUtil.getSingletonInstanceOrNull(containerClass);
@@ -39,7 +61,7 @@ public class ModIntegrationManager {
         for (Field field : clazz.getFields()) {
             ModProxy proxyAnnotation = field.getAnnotation(ModProxy.class);
             if (proxyAnnotation != null) {
-                String modid = proxyAnnotation.value();
+                String modid = proxyAnnotation.targetModid();
                 proxies.put(modid, field);
             }
         }

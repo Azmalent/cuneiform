@@ -4,11 +4,17 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.lang.reflect.Field;
 
+/**
+ * A string config option.
+ */
 public final class StringOption extends BasicOption<String> {
     private StringOption(String defaultValue) {
         super(defaultValue);
     }
 
+    /**
+     * Creates a string option with the given default value.
+     */
     public static StringOption of(String defaultValue) {
         return new StringOption(defaultValue);
     }

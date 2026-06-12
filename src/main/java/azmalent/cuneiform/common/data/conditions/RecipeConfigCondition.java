@@ -7,6 +7,21 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * A recipe condition that checks a boolean config flag registered with
+ * {@link ConfigFlagManager}.
+ *
+ * <p>JSON format:</p>
+ * <pre>{@code
+ * {"type": "cuneiform:config", "config": "modid:flag_name"}
+ * }</pre>
+ *
+ * <p>When the flag evaluates to {@code true}, the recipe is loaded. When
+ * {@code false}, the recipe is excluded.</p>
+ *
+ * @param modid the mod ID the flag belongs to
+ * @param flag the flag name
+ */
 public record RecipeConfigCondition(String modid, String flag) implements ICondition {
     public static final ResourceLocation ID = Cuneiform.prefix("config");
 
@@ -25,6 +40,9 @@ public record RecipeConfigCondition(String modid, String flag) implements ICondi
         return ConfigFlagManager.getFlag(modid, flag);
     }
 
+    /**
+     * Serializer for {@link RecipeConfigCondition}.
+     */
     public record Serializer() implements IConditionSerializer<RecipeConfigCondition> {
         @Override
         public void write(JsonObject json, RecipeConfigCondition value) {

@@ -22,7 +22,6 @@ public final class Cuneiform {
 
     //TODO: list & map support for auto package serializer
     //TODO: config support for arbitrary objects/records
-    //TODO: javadocs
     public Cuneiform(FMLJavaModLoadingContext context) {
         IEventBus modBus = context.getModEventBus();
         modBus.addListener(Cuneiform::registerRecipeTypes);

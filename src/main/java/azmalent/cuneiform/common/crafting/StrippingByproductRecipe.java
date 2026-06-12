@@ -21,6 +21,22 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+/**
+ * A custom recipe type that defines a byproduct drop when stripping a block
+ * with an axe (via the {@link azmalent.cuneiform.mixin.AxeItemMixin}).
+ *
+ * <p>JSON format:</p>
+ * <pre>{@code
+ * {
+ *   "type": "cuneiform:stripping_byproduct",
+ *   "block": "minecraft:oak_log",
+ *   "output": { "item": "minecraft:stick" },
+ *   "chance": 0.5
+ * }
+ * }</pre>
+ *
+ * <p>The {@code chance} field is optional and defaults to 1.0 (100%).</p>
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StrippingByproductRecipe implements Recipe<Container> {
@@ -32,6 +48,14 @@ public class StrippingByproductRecipe implements Recipe<Container> {
     private final ItemStack output;
     private final float chance;
 
+    /**
+     * Creates a new stripping byproduct recipe.
+     *
+     * @param id the recipe ID
+     * @param block the registry ID of the block that triggers the byproduct
+     * @param output the item stack to drop
+     * @param chance the probability (0–1) of dropping the byproduct
+     */
     public StrippingByproductRecipe(ResourceLocation id, ResourceLocation block, ItemStack output, float chance) {
         Preconditions.checkArgument(0 <= chance && chance <= 1, "Chance must be between 0 and 1");
 
@@ -41,14 +65,30 @@ public class StrippingByproductRecipe implements Recipe<Container> {
         this.chance = chance;
     }
 
+    /**
+     * Returns the probability of dropping the byproduct.
+     *
+     * @return the chance, between 0 and 1
+     */
     public float getChance() {
         return chance;
     }
 
+    /**
+     * Checks whether this recipe matches the given block state.
+     *
+     * @param state the block state to test
+     * @return {@code true} if the block matches
+     */
     public boolean matches(BlockState state) {
         return block == state.getBlock();
     }
 
+    /**
+     * Returns a copy of the byproduct output stack.
+     *
+     * @return the output item stack
+     */
     public ItemStack getOutput() {
         return output.copy();
     }
@@ -89,6 +129,9 @@ public class StrippingByproductRecipe implements Recipe<Container> {
         return Serializer.INSTANCE;
     }
 
+    /**
+     * Serializer for {@link StrippingByproductRecipe}.
+     */
     public static class Serializer implements RecipeSerializer<StrippingByproductRecipe> {
         public static final Serializer INSTANCE = new Serializer();
 

@@ -19,6 +19,29 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 
 //TODO: rewrite config system
+/**
+ * Base class for annotation-driven configuration files built on Forge's
+ * {@link ForgeConfigSpec} and NightConfig.
+ *
+ * <p>Subclasses should:</p>
+ * <ol>
+ *   <li>Extend this class and call the constructor with their mod ID and config type</li>
+ *   <li>Define public static fields of {@link AbstractConfigOption} subtypes</li>
+ *   <li>Optionally group fields in inner static classes to create config categories</li>
+ *   <li>Annotate fields with {@link Name} and {@link Comment} for display names and comments</li>
+ *   <li>Call {@link #buildSpec()}, {@link #register()}, and optionally {@link #sync()}</li>
+ * </ol>
+ *
+ * <p>Config flags for use in JSON conditions (recipes, loot tables) are registered
+ * automatically from {@link BooleanOption} instances that have a non-null config flag name.</p>
+ *
+ * <p>Subclasses typically use an {@code INSTANCE} singleton pattern, discovered via
+ * {@link ReflectionUtil#getSingletonInstanceOrNull}.</p>
+ *
+ * @see AbstractConfigOption
+ * @see Name
+ * @see Comment
+ */
 public abstract class ConfigFile {
     protected final String modid;
     protected final ModConfig.Type configType;
@@ -29,10 +52,25 @@ public abstract class ConfigFile {
         this.configType = configType;
     }
 
+    /**
+     * Returns the config filename in the format {@code "modid-type.toml"}.
+     *
+     * @return the config filename
+     */
     protected String getConfigFilename() {
         return "%s-%s.toml".formatted(modid, configType.toString().toLowerCase());
     }
 
+    /**
+     * Initializes all config option fields on the given class by scanning its
+     * public fields for {@link AbstractConfigOption} instances.
+     *
+     * <p>For {@link BooleanOption} fields with a config flag, the flag is
+     * automatically registered with {@link ConfigFlagManager} (COMMON configs only).</p>
+     *
+     * @param clazz the class whose fields to scan
+     * @param builder the config spec builder
+     */
     protected final void initOptions(Class<?> clazz, ForgeConfigSpec.Builder builder) {
         var instance = ReflectionUtil.getSingletonInstanceOrNull(clazz);
 
@@ -58,6 +96,15 @@ public abstract class ConfigFile {
         }
     }
 
+    /**
+     * Initializes a config category by scanning the given class and its inner classes.
+     *
+     * <p>The category name is derived from the {@link Name} annotation or the
+     * class's simple name (split from camelCase).</p>
+     *
+     * @param clazz the category class
+     * @param builder the config spec builder
+     */
     protected final void initCategory(Class<?> clazz, ForgeConfigSpec.Builder builder) {
         Name name = clazz.getAnnotation(Name.class);
         String categoryName = (name != null) ? name.value() : StringUtil.splitCamelCase(clazz.getSimpleName());
@@ -77,6 +124,10 @@ public abstract class ConfigFile {
         builder.pop();
     }
 
+    /**
+     * Builds the {@link ForgeConfigSpec} by scanning this class and its inner
+     * classes for config option fields.
+     */
     public final void buildSpec() {
         var builder = new ForgeConfigSpec.Builder();
 
@@ -89,6 +140,9 @@ public abstract class ConfigFile {
         spec = builder.build();
     }
 
+    /**
+     * Registers the config with Forge and attaches load/reload listeners.
+     */
     public final void register() {
         ModLoadingContext.get().registerConfig(configType, spec, getConfigFilename());
 
@@ -100,19 +154,31 @@ public abstract class ConfigFile {
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfigEvent.Reloading event) -> {
             if (event.getConfig().getSpec() == this.spec) {
-                this.onFileChange();
+                this.onReload();
             }
         });
     }
 
+    /**
+     * Called when the config is loaded for the first time.
+     * Override to perform custom initialization logic.
+     */
     protected void onLoad() {
         Cuneiform.LOGGER.info("Loading config file " + getConfigFilename());
     }
 
-    protected void onFileChange() {
+    /**
+     * Called when the config file is reloaded (e.g. via the {@code /forge config} command).
+     * Override to perform custom reload logic.
+     */
+    protected void onReload() {
         Cuneiform.LOGGER.info("Reloading config file " + getConfigFilename());
     }
 
+    /**
+     * Synchronizes the config from disk. Only applicable to clientside configs;
+     * logs a warning if called on a server config.
+     */
     public void sync() {
         if (configType == ModConfig.Type.SERVER) {
             Cuneiform.LOGGER.warn("sync() called on a server config");

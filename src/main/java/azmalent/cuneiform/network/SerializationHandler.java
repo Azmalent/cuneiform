@@ -18,19 +18,42 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Automagically serializes basic network messages using reflection. <p>
- * The message class must be a record implementing IMessage. <p>
- * Loosely based on <a href="https://github.com/VazkiiMods/AutoRegLib/blob/master/src/main/java/vazkii/arl/network/MessageSerializer.java">MessageSerializer.java</a>
- * from AutoRegLib.
+ * Automagically serializes network messages using reflection.
+ *
+ * <p>The message class must be a {@code record} implementing {@link IMessage}.
+ * All record components are serialized and deserialized in declaration order
+ * using the registered {@link INetworkSerializer} for each component's type.</p>
+ *
+ * <p>The following types are supported by default:</p>
+ * <ul>
+ *   <li>All primitive types and their boxed equivalents</li>
+ *   <li>{@link String}, {@link Component}, {@link ResourceLocation}</li>
+ *   <li>{@link ItemStack}, {@link CompoundTag}, {@link BlockPos}, {@link UUID}</li>
+ *   <li>Enum types (via {@link FriendlyByteBuf#readEnum})</li>
+ *   <li>Arrays of any supported type</li>
+ * </ul>
+ *
+ * <p>For custom types, call {@link #registerSerializer(Class, INetworkSerializer)}
+ * or {@link #registerSerializer(Class, NetworkReader, NetworkWriter)} before
+ * registering the message class.</p>
+ *
+ * <p>Loosely based on <a href="https://github.com/VazkiiMods/AutoRegLib/blob/master/src/main/java/vazkii/arl/network/MessageSerializer.java">MessageSerializer.java</a>
+ * from AutoRegLib.</p>
  */
 @SuppressWarnings("unchecked")
 public final class SerializationHandler {
     private static final Map<Class<?>, INetworkSerializer<?>> serializers = Maps.newHashMap();
 
+    /**
+     * Registers a custom serializer for the given type.
+     */
     public static <T> void registerSerializer(Class<T> clazz, INetworkSerializer<T> serializer) {
         serializers.put(clazz, serializer);
     }
 
+    /**
+     * Registers a custom serializer using separate reader and writer functions.
+     */
     public static <T> void registerSerializer(Class<T> clazz, NetworkReader<T> reader, NetworkWriter<T> writer) {
         serializers.put(clazz, new NetworkSerializer<T>(reader, writer));
     }
@@ -53,6 +76,10 @@ public final class SerializationHandler {
         registerSerializer(UUID.class, FriendlyByteBuf::readUUID, FriendlyByteBuf::writeUUID);
     }
 
+    /**
+     * Encodes a record message into the network buffer by serializing each
+     * record component in declaration order.
+     */
     public static <T extends Record & IMessage> void encodeMessage(FriendlyByteBuf buffer, T message) {
         Class<T> clazz = (Class<T>) message.getClass();
         assert clazz.isRecord();
@@ -69,6 +96,12 @@ public final class SerializationHandler {
         }
     }
 
+    /**
+     * Decodes a record message from the network buffer by reading each
+     * record component in declaration order and constructing the record.
+     *
+     * @return the decoded message, or {@code null} if decoding failed
+     */
     public static <T extends Record & IMessage> T decodeMessage(Class<T> clazz, FriendlyByteBuf buffer) {
         assert clazz.isRecord();
 
@@ -130,6 +163,9 @@ public final class SerializationHandler {
         }
     }
 
+    /**
+     * Internal adapter that wraps a reader and writer into an {@link INetworkSerializer}.
+     */
     private record NetworkSerializer<T>(NetworkReader<T> reader, NetworkWriter<T> writer) implements INetworkSerializer<T> {
         @Override
         public T read(FriendlyByteBuf buffer) {

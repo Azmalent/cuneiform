@@ -12,6 +12,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
+/**
+ * Represents a registered entity type, wrapping a {@link RegistryObject}.
+ *
+ * @param <T> the entity type
+ */
 public class EntityEntry<T extends Entity> implements Supplier<EntityType<T>> {
     private final RegistryObject<EntityType<T>> TYPE;
 
@@ -19,6 +24,13 @@ public class EntityEntry<T extends Entity> implements Supplier<EntityType<T>> {
         TYPE = type;
     }
 
+    /**
+     * Creates and registers an entity entry.
+     *
+     * @param helper the registry helper
+     * @param id the entity's registry ID path
+     * @param builder the entity type builder
+     */
     public EntityEntry(RegistryHelper helper, String id, EntityType.Builder<T> builder) {
         var registry = helper.getRegister(ForgeRegistries.ENTITY_TYPES);
         TYPE = registry.register(id, () -> builder.build(new ResourceLocation(helper.modid, id).toString()));
@@ -29,6 +41,11 @@ public class EntityEntry<T extends Entity> implements Supplier<EntityType<T>> {
         return TYPE.get();
     }
 
+    /**
+     * Registers an entity renderer for this entity type (client side only).
+     *
+     * @param renderer the entity renderer provider
+     */
     @OnlyIn(Dist.CLIENT)
     public void registerRenderer(EntityRendererProvider<T> renderer) {
         EntityRenderers.register(get(), renderer);
