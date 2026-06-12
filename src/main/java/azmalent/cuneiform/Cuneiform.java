@@ -34,6 +34,8 @@ public final class Cuneiform {
         eventBus.addListener(FuelHandler::getBurnTime);
         eventBus.addListener(WanderingTraderHandler::registerTrades);
 
+        initConfig();
+
         CuneiformNetwork.registerMessages();
     }
 
