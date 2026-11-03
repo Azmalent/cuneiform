@@ -11,7 +11,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
@@ -24,8 +23,7 @@ public final class Cuneiform {
 
     //TODO: list & map support for auto package serializer
     //TODO: config support for arbitrary objects/records
-    public Cuneiform(FMLJavaModLoadingContext context) {
-        IEventBus modBus = context.getModEventBus();
+    public Cuneiform(IEventBus modBus) {
         modBus.addListener(Cuneiform::registerRecipeTypes);
         modBus.addListener(ConfigFlagManager::setup);
 
@@ -66,6 +64,6 @@ public final class Cuneiform {
     }
 
     public static ResourceLocation prefix(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, name);
+        return new ResourceLocation(MODID, name);
     }
 }

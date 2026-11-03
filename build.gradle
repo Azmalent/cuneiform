@@ -1,9 +1,8 @@
 //file:noinspection SpellCheckingInspection
 plugins {
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0, 6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'java-library'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.148'
 }
 
 group = "azmalent"
@@ -13,60 +12,70 @@ base {
     archivesName = modid
 }
 
+// Minecraft 1.20.1 ships with Java 17, so mods have to target it as well.
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
-minecraft {
-    mappings channel: mappings_channel, version: mappings_version
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+legacyForge {
+    // NeoForge for 1.20.1 is published as net.neoforged:forge and keeps the
+    // legacy net.minecraftforge package names.
+    enable {
+        neoForgeVersion = "${minecraft_version}-${neo_version}"
+    }
 
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-    copyIdeResources = true
+    parchment {
+        minecraftVersion = parchment_minecraft_version
+        mappingsVersion = parchment_mappings_version
+    }
 
+    // Validate the access transformer and fail on invalid targets.
+    validateAccessTransformers = true
+
+    // Access transformers are picked up from src/main/resources/META-INF/accesstransformer.cfg automatically.
     runs {
         client {
-            workingDirectory project.file('run')
-            taskName 'Client'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                }
-            }
+            client()
+            systemProperty 'forge.enabledGameTestNamespaces', modid
         }
 
         server {
-            workingDirectory project.file('run')
-            taskName 'Server'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                }
-            }
+            server()
+            programArgument '--nogui'
+            systemProperty 'forge.enabledGameTestNamespaces', modid
         }
 
         data {
-            workingDirectory project.file('run')
-            args '--mod', modid, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            taskName 'Data'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modDataRun {
-                    source sourceSets.main
-                }
-            }
+            data()
+            programArguments.addAll '--mod', modid, '--all',
+                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${modid}" {
+            sourceSet sourceSets.main
         }
     }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// 'localRuntime' dependencies (such as the full JEI jar) are only used for local testing
+// and are not pulled in by projects that depend on this mod.
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+obfuscation {
+    createRemappingConfiguration(configurations.localRuntime)
+}
 
 repositories {
     maven { // JEI
@@ -76,12 +85,11 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
-    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
-    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+    modLocalRuntime("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
 }
 
 mixin {
@@ -89,13 +97,30 @@ mixin {
     config "${modid}.mixins.json"
 }
 
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : modid,
+                "Specification-Vendor"    : "azmalent",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "azmalent",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+
+                "MixinConfigs"            : "${modid}.mixins.json"
+        ])
+    }
+}
+
 processResources {
     var replaceProperties = [
-        'mod_name': mod_name, 'mod_version': project.version,
-        'mod_description': mod_description, 'mod_license': mod_license,
-        'mod_homepage': mod_homepage, 'mod_github': mod_github,
-        'minecraft_version': minecraft_version, 'minecraft_version_range': minecraft_version_range,
-        'fml_min': fml_min, 'forge_version': forge_version
+            'mod_name'               : mod_name, 'mod_version': project.version,
+            'mod_description'        : mod_description, 'mod_license': mod_license,
+            'mod_homepage'           : mod_homepage, 'mod_github': mod_github,
+            'minecraft_version'      : minecraft_version,
+            'minecraft_version_range': minecraft_version_range,
+            'fml_min'                : fml_min, 'neo_version': neo_version
     ]
 
     inputs.properties replaceProperties
@@ -103,27 +128,6 @@ processResources {
     filesMatching('META-INF/mods.toml') {
         expand replaceProperties + [project: project]
     }
-}
-
-jar {
-    manifest {
-        attributes([
-                "Specification-Title": modid,
-                "Specification-Vendor": "azmalent",
-                "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": project.name,
-                "Implementation-Version": project.jar.archiveVersion,
-                "Implementation-Vendor": "azmalent",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-
-                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                "MixinConfigs": "${modid}.mixins.json",
-                'FMLCorePluginContainsFMLMod': 'true',
-                'ForceLoadAsMod': 'true'
-        ])
-    }
-
-    finalizedBy 'reobfJar'
 }
 
 tasks.withType(JavaCompile).configureEach {

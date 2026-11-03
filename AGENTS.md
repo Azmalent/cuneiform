@@ -1,14 +1,26 @@
 # Cuneiform — AI Agent Guide
 
-A Minecraft Forge library mod (1.20.1) providing shared infrastructure for other mods by the same author (Azmalent). Not a standalone gameplay mod — consumed as a dependency.
+A Minecraft **NeoForge** library mod (1.20.1) providing shared infrastructure for other mods by the same author (Azmalent). Not a standalone gameplay mod — consumed as a dependency.
 
 ## Project Essentials
 
 - **Mod ID:** `cuneiform` | **Package root:** `azmalent.cuneiform`
-- **Forge 1.20.1** (v47.4.10), Java 17, Mixin 0.8.5, Parchment mappings
+- **NeoForge 1.20.1** (`47.1.106`, published as `net.neoforged:forge`), Java 17, Mixin 0.8.5, Parchment `2023.09.03`
+- **Build system:** ModDevGradle Legacy Forge plugin (`net.neoforged.moddev.legacyforge` 2.0.148), Gradle 8.14.6
 - **Build:** `./gradlew build` | **Run client:** `./gradlew runClient` | **Run server:** `./gradlew runServer`
 - **Data gen:** `./gradlew runData` (outputs to `src/generated/resources/`)
 - Gradle daemon is **disabled** (`org.gradle.daemon=false`); JVM gets 3 GB heap.
+- The Gradle daemon must run on **JDK 17+** (`JAVA_HOME`); the build targets a Java 17 toolchain.
+
+## NeoForge specifics for 1.20.1
+
+NeoForge for 1.20.1 is a fork of Forge 47.1.x with **binary compatibility**, so it deliberately keeps the legacy package names:
+
+- Mod-facing APIs are still `net.minecraftforge.*` (`net.minecraftforge.eventbus.api.IEventBus`, `net.minecraftforge.registries.DeferredRegister`, `net.minecraftforge.common.ForgeConfigSpec`, `net.minecraftforge.network.simple.SimpleChannel`, ...). Do **not** import `net.neoforged.neoforge.*` — those packages do not exist on 1.20.1.
+- FML is `net.minecraftforge.fml` (fancymodloader `47.2.2`); the loader registers itself under the mod ID `"forge"`, which is why `mods.toml` still depends on `forge` with version range `[47.1.106,)`.
+- The `@Mod` constructor **must** take only `IEventBus`, `ModContainer` or `FMLModContainer`. Passing an `FMLJavaModLoadingContext` parameter fails at runtime with "Could not find mod constructor".
+- `ModLoadingContext.get().registerConfig(...)` still exists and is the correct way to register configs here.
+- `ResourceLocation.fromNamespaceAndPath(...)` does **not** exist on 1.20.1 (it is a LexForge 47.4+/1.21 addition). Use `new ResourceLocation(namespace, path)`.
 
 ## Architecture Overview
 
@@ -16,7 +28,7 @@ The mod is organized into six functional areas under `azmalent.cuneiform`:
 
 | Area | Purpose |
 |---|---|
-| `registry/` | Fluent builder API wrapping Forge's `DeferredRegister` for blocks, items, block entities, entities, and mobs |
+| `registry/` | Fluent builder API wrapping `DeferredRegister` for blocks, items, block entities, entities, and mobs |
 | `config/` | Annotation-driven config system (`@Name`, `@Comment`) built on Forge's `ForgeConfigSpec` + NightConfig |
 | `network/` | Auto-serializing network messages via Java records + reflection (`SerializationHandler`) |
 | `modproxy/` | Optional-mod-integration framework using `@ModProxy`, `@IntegrationImpl`, `@IntegrationDummy` annotations |
@@ -38,10 +50,10 @@ The mod is organized into six functional areas under `azmalent.cuneiform`:
 
 ## Conventions
 
-- **Resource locations:** Use `Cuneiform.prefix("name")` → `ResourceLocation.fromNamespaceAndPath("cuneiform", "name")`
+- **Resource locations:** Use `Cuneiform.prefix("name")` → `new ResourceLocation("cuneiform", "name")`
 - **Singleton config:** Config files use an `INSTANCE` singleton field; `ReflectionUtil.getSingletonInstanceOrNull()` discovers it via reflection.
 - **Mixin accessors** are placed in `mixin.accessor` and use `@Invoker` with `cuneiform_` prefix to avoid collisions.
-- **Event registration:** Forge bus events (e.g., `FuelHandler`, `WanderingTraderHandler`) are registered on `MinecraftForge.EVENT_BUS`; mod bus events (e.g., `RegisterEvent`, `ConfigFlagManager.setup`) on the mod event bus.
+- **Event registration:** Game bus events (e.g., `FuelHandler`, `WanderingTraderHandler`) are registered on `MinecraftForge.EVENT_BUS` (NeoForge keeps this legacy class name on 1.20.1); mod bus events (e.g., `RegisterEvent`, `ConfigFlagManager.setup`) on the mod event bus injected into the `@Mod` constructor.
 - **Generated resources** go to `src/generated/resources/` (added as a source set in `build.gradle`).
 
 ## Key Files
